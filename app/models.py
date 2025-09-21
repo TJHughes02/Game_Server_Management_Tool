@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 #User table
 class  User(db.Model):
@@ -32,6 +33,8 @@ class NodeUser(db.Model):
 class ServerInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     server_id = db.Column(db.Integer, db.ForeignKey("Servers.id"), nullable=False)
+    start_time = db.Column(db.DateTime, default=datetime.now())
+    #end_time = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
         return f"<ServerInfo {self.id}>"
