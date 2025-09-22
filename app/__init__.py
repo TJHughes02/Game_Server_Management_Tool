@@ -10,7 +10,7 @@ migrate = Migrate()
 def create_app():
     # create the flask app obj and enable CORS so frontend requests can succeed
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, origins=["http://localhost:5173"])
     #configure flask app
     app.config.from_object(Config)
 
