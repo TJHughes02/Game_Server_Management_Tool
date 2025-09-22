@@ -1,6 +1,6 @@
 # Capstone Project_Hughes_Werling
 
-## Private Server Management Tool
+## Game Server Management Tool
 
 ## Description
 We are seeking to develop a web-based server management tool that allows users to manage game servers remotely using remote console (RCON). This project aims to simplify server management for individuals who host private RCON game servers in a larger scale.
