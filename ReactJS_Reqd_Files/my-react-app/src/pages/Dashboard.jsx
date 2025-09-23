@@ -33,7 +33,11 @@ export default function Dashboard() {
                     </div>
                     <div className="tile">
                         <h3>Console</h3>
-                        <p className="muted">Live log & RCON coming soon.(cant promise but maybe)</p>
+                        <p className="muted">Live log & RCON coming soon.(cant promise but maybe)
+
+
+                            hkjfhkjlfhsdlkjfhsdlkjfhdaslkjfsdljkfalsjdhkfjlshkdfljkh
+                        </p>
                     </div>
                 </div>
                 <button className="btn" onClick={logout}>Log out</button>

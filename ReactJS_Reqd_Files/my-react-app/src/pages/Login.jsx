@@ -70,7 +70,7 @@ export default function Login() {
             type="text"
             value={displayName}
             onChange={e => setDisplayName(e.target.value)}
-            placeholder="e.g., TestUser"
+            placeholder="username"
             autoFocus
           />
         </label>
@@ -82,7 +82,7 @@ export default function Login() {
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            placeholder="••••••••"
+            placeholder="password"
           />
         </label>
 
