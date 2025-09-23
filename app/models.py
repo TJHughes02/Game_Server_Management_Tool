@@ -1,9 +1,10 @@
 from app import db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 #User table
 class  User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     is_owner = db.Column(db.Boolean)
     display_name = db.Column(db.VARCHAR(80), nullable=False)
@@ -11,6 +12,14 @@ class  User(db.Model):
 
     def __repr__(self):
         return f"<User {self.id}>"
+
+    def set_pass(self, password):
+        self.pass_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.pass_hash, password)
+
+
 
 #Servers table
 class Servers(db.Model):
