@@ -1,21 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext.jsx'
 import { useNavigate } from 'react-router-dom'
 
-
 export default function Dashboard() {
-    const [user, setUser] = useState(null)
+    const { user, logout } = useAuth()
     const nav = useNavigate()
-    useEffect(() => {
-        const raw = localStorage.getItem('demoUser')
-        if (raw) setUser(JSON.parse(raw))
-    }, [])
 
-
-    function logout() {
-        localStorage.removeItem('demoUser')
+    async function handleLogout() { // no currently used yet, may be removed
+        logout()
         nav('/login')
     }
-
 
     return (
         <main className="page">
