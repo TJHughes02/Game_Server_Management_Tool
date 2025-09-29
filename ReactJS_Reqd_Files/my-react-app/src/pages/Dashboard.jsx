@@ -29,7 +29,7 @@ export default function Dashboard() {
                         <p className="muted">Live log & RCON coming soon.(cant promise but maybe)
 
 
-                            hkjfhkjlfhsdlkjfhsdlkjfhdaslkjfsdljkfalsjdhkfjlshkdfljkh
+                            hkjfhkjlfhsdlkjfhsdlkjfhdaslkjfsdljkfalsjdhkfjlshkdfljkh add characters!
                         </p>
                     </div>
                 </div>
