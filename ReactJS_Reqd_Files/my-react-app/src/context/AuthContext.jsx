@@ -5,13 +5,13 @@ const AuthCtx = createContext(null)
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
 
-    // bootstrap from storage (or later from /api/me)
+    // uses api/me
     useEffect(() => {
         const raw = localStorage.getItem('authUser')
         if (raw) setUser(JSON.parse(raw))
     }, [])
 
-    // helper to log out everywhere
+    // helper to log out everywhere (not impl yet)
     function logout() {
         localStorage.removeItem('authUser')
         setUser(null)
