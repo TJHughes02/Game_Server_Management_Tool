@@ -7,7 +7,7 @@ class  User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     is_owner = db.Column(db.Boolean)
-    display_name = db.Column(db.VARCHAR(80), nullable=False)
+    display_name = db.Column(db.VARCHAR(80), unique=True, nullable=False)
     pass_hash = db.Column(db.VARCHAR(120), nullable=False)
 
     def __repr__(self):
