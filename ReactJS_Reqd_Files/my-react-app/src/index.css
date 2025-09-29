@@ -1,68 +1,120 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ===== Core variables & base ===== */
+:root{
+  --nav-h:56px;
+  --bg:#0f1115; --bg-soft:#151821; --card:#1b2130; --text:#e7e8ea;
+  --muted:#a0a6b1; --brand:#5b9cff; --border:#263043;
+  font-family:system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height:1.5; font-weight:400;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+*,*::before,*::after{ box-sizing:border-box; }
+html,body,#root{ height:100%; }
+body{ margin:0; background:var(--bg); color:var(--text); }
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* ===== App shell & Navbar ===== */
+.app-shell{ min-height:100vh; background:var(--bg); color:var(--text); }
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.navbar{
+  position:sticky; top:0; height:var(--nav-h);
+  background:rgba(15,17,21,.85); backdrop-filter:saturate(180%) blur(8px);
+  border-bottom:1px solid var(--border); box-sizing:border-box; z-index:10;
 }
+.nav-inner{
+  max-width:1200px; margin:0 auto; height:100%;
+  display:flex; align-items:center; justify-content:space-between; padding:0 16px;
+}
+.brand{ font-weight:700; color:var(--text); text-decoration:none; }
+.nav-links{ display:flex; align-items:center; gap:12px; }
+.link{ color:var(--muted); text-decoration:none; padding:8px 10px; border-radius:10px; }
+.link.active{ color:var(--text); background:var(--bg-soft); }
+.btn.small{ padding:6px 10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text); }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+/* ===== Login page ===== */
+.page.login-hero{ padding:0; }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Full-viewport area minus nav; centered; no overflow */
+.login-hero{
+  height:calc(100svh - var(--nav-h));
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden; isolation:isolate;
+  background:none;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Background GIF layer */
+.login-hero::before{
+  content:""; position:absolute; inset:0;
+  background:url("/bg.gif") center center / cover no-repeat;
+  z-index:-2; transform:translateZ(0);
+}
+
+/* Gradient overlay for contrast */
+.login-hero::after{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:
+    radial-gradient(1200px 600px at 110% -10%, rgba(91,156,255,.15), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(123,198,123,.12), transparent 60%),
+    linear-gradient(180deg, rgba(21,24,33,.85), rgba(21,24,33,.98));
+}
+
+/* Login card */
+.login-card{
+  width:100%; max-width:840px; background:var(--card);
+  border:1px solid var(--border); border-radius:22px;
+  box-shadow:0 18px 60px rgba(0,0,0,.35); overflow:hidden; position:relative; z-index:1;
+}
+.login-header{ padding:36px 40px 8px; text-align:center; }
+.login-badge{
+  display:inline-block; font-size:.85rem; padding:6px 10px;
+  border:1px solid var(--border); border-radius:999px; color:var(--muted);
+  margin-bottom:12px; background:rgba(255,255,255,.02); user-select:none;
+}
+.login-title{ margin:0; font-size:2rem; letter-spacing:.2px; }
+.login-subtitle{ margin:8px 0 16px; color:var(--muted); }
+
+/* Backend status pill (bottom-left, fixed) */
+.login-hero .login-status{
+  position:fixed; left:16px; bottom:16px; margin:0; z-index:20;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 10px; border-radius:10px;
+  border:1px solid var(--border); backdrop-filter:blur(6px);
+  background:rgba(20,24,32,.6);
+}
+.login-hero .login-status.ok{ color:#8fd18f; border-color:#335a33; background:rgba(51,90,51,.25); }
+.login-hero .login-status.bad{ color:#ffb4c8; border-color:#6b2a39; background:#3b1f26; }
+
+/* Form */
+.login-form{ display:grid; gap:16px; padding:22px 40px 18px; }
+.login-label{ display:grid; gap:8px; }
+.login-label>span{ font-size:.95rem; color:var(--muted); text-align:left; }
+.login-input{
+  border:1px solid var(--border); background:#0f1420; color:var(--text);
+  border-radius:14px; padding:14px 16px; font-size:1rem; outline:none;
+}
+.login-input:focus{ border-color:rgba(91,156,255,.6); box-shadow:0 0 0 3px rgba(91,156,255,.16); }
+.login-error{
+  background:#3b1f26; border:1px solid #6b2a39; color:#ffb4c8;
+  border-radius:14px; padding:10px 12px;
+}
+.login-button{
+  width:100%; border:none; border-radius:14px; padding:14px 18px;
+  font-weight:600; cursor:pointer; color:#0a1020; font-size:1rem;
+  background:linear-gradient(180deg, var(--brand), #4a86e6);
+  transition:transform .06s ease, filter .2s ease;
+}
+.login-button:disabled{ opacity:.7; cursor:not-allowed; filter:saturate(.6); }
+.login-button:not(:disabled):hover{ filter:brightness(1.05); }
+.login-button:not(:disabled):active{ transform:translateY(1px); }
+.login-footer{ padding:12px 40px 36px; display:flex; justify-content:center; }
+.login-hint{ color:var(--muted); font-size:.95rem; }
+
+/* Desktop scaling */
+@media (min-width:1200px){
+  .login-title{ font-size:2.2rem; }
+  .login-input{ font-size:1.05rem; padding:16px 18px; }
+  .login-button{ font-size:1.05rem; padding:16px 20px; }
+}
+
+/* Accessibility: reduced motion fallback for GIF */
+@media (prefers-reduced-motion: reduce){
+  .login-hero::before{ background-image:url("/bg-still.jpg"); }
 }
