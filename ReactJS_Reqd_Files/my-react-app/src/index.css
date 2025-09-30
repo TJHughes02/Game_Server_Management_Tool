@@ -114,7 +114,26 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   .login-button{ font-size:1.05rem; padding:16px 20px; }
 }
 
-/* Accessibility: reduced motion fallback for GIF */
+/* Accessibility: reduced motion fallback for GIF (currently not used) */
 @media (prefers-reduced-motion: reduce){
   .login-hero::before{ background-image:url("/bg-still.jpg"); }
+}
+
+
+/* --- NavBar: edge-to-edge brand left, buttons right --- */
+.nav-inner{
+  max-width: none !important;
+  width: 100% !important;
+  padding: 80 !important;
+  justify-content: space-between !important;
+}
+
+.nav-links{
+  margin-left: auto !important; /* push links to the far right */
+}
+
+/* If your brand has inherent padding/margins, neutralize them */
+.brand{
+  margin: 0 !important;
+  padding: 0 !important;
 }
