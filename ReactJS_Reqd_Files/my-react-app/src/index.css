@@ -137,3 +137,18 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   margin: 0 !important;
   padding: 0 !important;
 }
+
+/* --- Login field highlights --- */
+/* Inline validation */
+.login-input.invalid{
+  border-color:#b94d57;
+  box-shadow:0 0 0 3px rgba(185,77,87,.22);
+  background:#241417;
+}
+.field-error{
+  color:#ff9aa6;
+  font-size:.85rem;
+  line-height:1.3;
+  margin-top:6px;
+  padding-left:2px;
+}
