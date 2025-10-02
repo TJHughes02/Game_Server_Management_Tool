@@ -3,6 +3,8 @@ import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import NavBar from './components/NavBar.jsx'
+import Games from './pages/Games.jsx'
+import CreateServer from './pages/CreateServer.jsx' // not used yet
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 
 function ProtectedRoute({ children }) {
@@ -10,6 +12,8 @@ function ProtectedRoute({ children }) {
   return user ? children : <Navigate to="/login" replace />
 }
 
+// top portion is unprotected (not locked behind login) <Route>
+// bottom portion is protected (locked behind login) <ProtectedRoute>
 export default function App() {
   return (
     <AuthProvider>
@@ -18,11 +22,13 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/games" element={<Games />} />
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
+                <Route path="/servers/new" element={<CreateServer />} />
               </ProtectedRoute>
             }
           />
