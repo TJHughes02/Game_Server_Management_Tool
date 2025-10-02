@@ -4,6 +4,7 @@ from .models import User
 
 bp = Blueprint("routes", __name__)
 
+
 """
 @bp.route('/')
 def home():
@@ -13,8 +14,8 @@ def home():
 
 @bp.route("/api/health")
 def health_check():
-    print("Machine Spirit awaiting communion...")
-    machine_status = "awaiting communion"
+    print("Machine Spirit Awake and Vigilant... Awaiting Communion with Tech-Priest...")
+    machine_status = "Awaiting Tech-Priest"
     return jsonify({"Status": f'The Machine Spirit is {machine_status}'})
 
 
@@ -31,10 +32,12 @@ def login():
 
     user = User.query.filter_by(display_name=ident).first()
     if not user or not user.check_password(pwd):
+        print("Tech-Priest is not recognized...")
+        print("Rite of Activation failed...")
         return jsonify({"Status": f'The Machine Spirit is displeased, Login Failed.'}), 401
-    #print("Rite of Activation failed...")
 
     print("Rite of Activation successful...")
+    print(f'Welcome Tech-Priest {user}...')
     #return jsonify({"Status": f'The Machine Spirit is pleased, Login Successful. Praise the Omnissiah!'})
 
     session.clear()
@@ -62,5 +65,6 @@ def me():
 
 @bp.route("/api/logout", methods=["POST"])
 def logout():
+    print("Communion with the Machine Spirit severed. All sacred rites concluded. User egress complete.", flush= True)
     session.clear()
     return jsonify({"ok": True}), 200
