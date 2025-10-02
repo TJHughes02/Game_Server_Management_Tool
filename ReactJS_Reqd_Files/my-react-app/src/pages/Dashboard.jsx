@@ -1,40 +1,80 @@
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
-    const { user, logout } = useAuth()
-    const nav = useNavigate()
+  const { user } = useAuth()
+  const nav = useNavigate()
 
     async function handleLogout() { // no currently used yet, may be removed
         logout()
         nav('/login')
     }
 
-    return (
-        <main className="page">
-            <div className="container">
-                <h1>Dashboard</h1>
-                <p className="muted">Welcome{user?.email ? `, ${user.email}` : ''}!</p>
-                <div className="grid">
-                    <div className="tile">
-                        <h3>Servers</h3>
-                        <p className="muted">No servers yet. Add one later.</p>
-                    </div>
-                    <div className="tile">
-                        <h3>Backups</h3>
-                        <p className="muted">Set up rolling backups per node. (temporary)</p>
-                    </div>
-                    <div className="tile">
-                        <h3>Console</h3>
-                        <p className="muted">Live log & RCON coming soon.(cant promise but maybe)
+// THIS ENTIRE SECTION BELOW IS TEMPORARTY AND ONLY A TEMPLATE. MOST OF THIS WILL NOT BE USED
+// IN THE FINAL PRODUCT.
 
 
-                            hkjfhkjlfhsdlkjfhsdlkjfhdaslkjfsdljkfalsjdhkfjlshkdfljkh add characters!
-                        </p>
-                    </div>
-                </div>
-                <button className="btn" onClick={logout}>Log out</button>
+// Template servers (placeholder until your create-server flow exists)
+  const servers = [
+    { id: 1, name: 'Survival SMP', game: 'Minecraft', status: 'online',  players: '3/20',  uptime: '2h 14m' },
+    { id: 2, name: 'PvP Arena',    game: 'Rust',      status: 'offline', players: '0/50',  uptime: '—' },
+    { id: 3, name: 'Island Base',  game: 'ARK',       status: 'starting',players: '—',     uptime: '—' },
+    { id: 4, name: 'Modded SMP',   game: 'Minecraft', status: 'offline',players: '0/10',     uptime: '—' },
+  ]
+
+return (
+    <main className="page">
+      <div className="dash">
+        {/* Left 1/3 — compatible games (examples only) */}
+        <aside className="dash-sidebar">
+          <h2 className="dash-title">Compatible games</h2>
+          <p className="muted">Examples (RCON):</p>
+          <ul className="games-list">
+            <li>Minecraft</li>
+            <li>Rust</li>
+            <li>ARK: Survival Evolved</li>
+            <li>CS:GO</li>
+          </ul>
+
+          <Link to="/games" className="btn view-all">View all compatible games</Link>
+        </aside>
+
+        {/* Right 2/3 — servers */}
+        <section className="dash-main">
+          <header className="dash-header">
+            <div>
+              <h1 className="dash-greeting">Dashboard</h1>
+              <p className="muted">Welcome{user?.display_name ? `, ${user.display_name}` : ''}!</p>
             </div>
-        </main>
-    )
+            <button
+              className="btn primary"
+              onClick={() => nav('/servers/new')}
+              title="Create a new server"
+            >
+              + Create server
+            </button>
+          </header>
+
+          <div className="servers-grid">
+            {servers.map(s => (
+              <article key={s.id} className={`server-card ${s.status}`}>
+                <div className="server-top">
+                  <h3 className="server-name">{s.name}</h3>
+                  <span className={`status-pill ${s.status}`}>{s.status}</span>
+                </div>
+                <div className="server-meta">
+                  <div><span className="meta-label">Game</span>{s.game}</div>
+                  <div><span className="meta-label">Players</span>{s.players}</div>
+                  <div><span className="meta-label">Uptime</span>{s.uptime}</div>
+                </div>
+                <div className="server-actions">
+                  <Link to={`/servers/${s.id}`} className="btn small">Open</Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+    </main>
+  )
 }

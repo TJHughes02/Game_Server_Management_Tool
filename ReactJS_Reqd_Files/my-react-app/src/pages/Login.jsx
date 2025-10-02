@@ -71,7 +71,7 @@ export default function Login() {
     <main className="page login-hero">
       <div className="login-card">
         <div className="login-header">
-          <div className="login-badge">Server Manager</div>
+          <div className="login-badge">Game Server Management Tool</div>
           <h2 className="login-title">Welcome back</h2>
           <p className="login-subtitle">Sign in to access your dashboard</p>
 
