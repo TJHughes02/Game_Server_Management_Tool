@@ -4,7 +4,6 @@ import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import NavBar from './components/NavBar.jsx'
 import Games from './pages/Games.jsx'
-import CreateServer from './pages/CreateServer.jsx' // not used yet
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 
 function ProtectedRoute({ children }) {
@@ -28,7 +27,6 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
-                <Route path="/servers/new" element={<CreateServer />} />
               </ProtectedRoute>
             }
           />
