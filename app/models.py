@@ -14,7 +14,7 @@ class  User(db.Model):
     pass_hash           = db.Column(db.String(255), nullable=False)
 
     def __repr__(self):
-        return f"<User {self.id}>"
+        return f"<User {self.id}; {self.display_name}>"
 
     def set_pass(self, password):
         self.pass_hash = generate_password_hash(password)
@@ -30,14 +30,13 @@ class GameServerUser(db.Model):
     role                = db.Column(db.String(50), nullable=False)
 
 
-
 #Servers table
 class GameServer(db.Model):
     __tablename__       = 'game_server'
     id                  = db.Column(db.Integer, primary_key=True)
     name                = db.Column(db.String(120), nullable=False)
     game_type           = db.Column(db.String(120), nullable=False)
-    status              = db.Column(db.Enum("running", "stopped", "updating", name="server_status"), nullable=False)
+    status              = db.Column(db.Enum("Online", "Offline", "Updating", "Starting", "Stopping", name="server_status"), nullable=False)
     server_port         = db.Column(db.Integer, nullable=False)
     install_path        = db.Column(db.String(255), nullable=False)
     archive_path        = db.Column(db.String(255), nullable=True)
@@ -45,7 +44,14 @@ class GameServer(db.Model):
 
 
     def __repr__(self):
-        return f"<GameServer {self.id}>"
+        return f"<GameServer {self.id}; {self.name}>"
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "game_type": self.game_type,
+            "status": self.status,
+        }
 
 class RconConfig(db.Model):
     __tablename__       = 'rcon_config'

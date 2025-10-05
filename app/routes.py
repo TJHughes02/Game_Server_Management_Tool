@@ -1,15 +1,21 @@
 from flask import Blueprint, jsonify, request, session
 from . import db
-from .models import User
+from .models import User, GameServer
 
 bp = Blueprint("routes", __name__)
-
 
 """
 @bp.route('/')
 def home():
     return "Machine Spirit Awakened"
 """
+
+
+@bp.route("/api/home", methods=['GET'])
+def home():
+    print("The Data Reliquary hums. The faithful approach to commune with the Machine Spirit.")
+    return jsonify({"Status": "OK"}), 200
+
 
 
 @bp.route("/api/health")
@@ -34,7 +40,7 @@ def login():
     if not user or not user.check_password(pwd):
         print("Tech-Priest is not recognized...")
         print("Rite of Activation failed...")
-        return jsonify({"Status": f'The Machine Spirit is displeased, Login Failed.'}), 401
+        return jsonify({"Status": f'The Machine Spirit recoils. Credentials rejected..'}), 401
 
     print("Rite of Activation successful...")
     print(f'Welcome Tech-Priest {user}...')
@@ -68,3 +74,13 @@ def logout():
     print("Communion with the Machine Spirit severed. All sacred rites concluded. User egress complete.", flush= True)
     session.clear()
     return jsonify({"ok": True}), 200
+
+
+@bp.route("/api/dashboard", methods=["GET", "PATCH", "POST"])
+def dashboard():
+    print("The sacred cogs turn. All servers hum in obedience, ready for manipulation by the anointed.")
+    servers = GameServer.query.all()
+    return jsonify({
+        "ok": True,
+        "servers": [s.to_dict() for s in servers]
+    }), 200
