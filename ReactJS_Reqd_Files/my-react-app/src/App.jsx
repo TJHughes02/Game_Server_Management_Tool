@@ -4,6 +4,7 @@ import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import NavBar from './components/NavBar.jsx'
 import Games from './pages/Games.jsx'
+import CreateServer from './pages/CreateServer.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 
 function ProtectedRoute({ children }) {
@@ -19,9 +20,12 @@ export default function App() {
       <div className="app-shell">
         <NavBar />
         <Routes>
+          {/* Public */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/games" element={<Games />} />
+
+          {/* Protected */}
           <Route
             path="/dashboard"
             element={
@@ -30,6 +34,16 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/servers/new"
+            element={
+              <ProtectedRoute>
+                <CreateServer />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Returns 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
