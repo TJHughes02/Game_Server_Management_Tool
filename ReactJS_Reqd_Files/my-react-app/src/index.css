@@ -29,25 +29,32 @@ body{ margin:0; background:var(--bg); color:var(--text); }
 .link.active{ color:var(--text); background:var(--bg-soft); }
 .btn.small{ padding:6px 10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text); }
 
+/* Normalize real <button> so it matches .btn.small links in the navbar */
+.nav-links button.btn.small{
+  -webkit-appearance:none; appearance:none;
+  background:transparent; border:1px solid var(--border); border-radius:10px;
+  padding:6px 10px; color:var(--text); font:inherit; line-height:1;
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+}
+.nav-links .btn.small:hover{ background:var(--bg-soft); }
+.nav-links .btn.small:active{ transform:translateY(1px); }
+.nav-links .btn.small:focus-visible{ outline:none; box-shadow:0 0 0 2px rgba(91,156,255,.25); }
+.nav-links button.btn.small:disabled{ opacity:.6; cursor:not-allowed; }
+
 /* ===== Login page ===== */
 .page.login-hero{ padding:0; }
 
-/* Full-viewport area minus nav; centered; no overflow */
+/* Full-viewport area minus nav; centered; no overflow; GIF + gradient overlay */
 .login-hero{
   height:calc(100svh - var(--nav-h));
   display:flex; align-items:center; justify-content:center;
-  position:relative; overflow:hidden; isolation:isolate;
-  background:none;
+  position:relative; overflow:hidden; isolation:isolate; background:none;
 }
-
-/* Background GIF layer */
 .login-hero::before{
   content:""; position:absolute; inset:0;
   background:url("/bg.gif") center center / cover no-repeat;
   z-index:-2; transform:translateZ(0);
 }
-
-/* Gradient overlay for contrast */
 .login-hero::after{
   content:""; position:absolute; inset:0; z-index:-1;
   background:
@@ -71,7 +78,7 @@ body{ margin:0; background:var(--bg); color:var(--text); }
 .login-title{ margin:0; font-size:2rem; letter-spacing:.2px; }
 .login-subtitle{ margin:8px 0 16px; color:var(--muted); }
 
-/* Backend status pill (bottom-left, fixed) */
+/* Backend status pill (fixed bottom-left) */
 .login-hero .login-status{
   position:fixed; left:16px; bottom:16px; margin:0; z-index:20;
   display:inline-flex; align-items:center; gap:6px;
@@ -82,7 +89,7 @@ body{ margin:0; background:var(--bg); color:var(--text); }
 .login-hero .login-status.ok{ color:#8fd18f; border-color:#335a33; background:rgba(51,90,51,.25); }
 .login-hero .login-status.bad{ color:#ffb4c8; border-color:#6b2a39; background:#3b1f26; }
 
-/* Form */
+/* Form + validation */
 .login-form{ display:grid; gap:16px; padding:22px 40px 18px; }
 .login-label{ display:grid; gap:8px; }
 .login-label>span{ font-size:.95rem; color:var(--muted); text-align:left; }
@@ -91,6 +98,9 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   border-radius:14px; padding:14px 16px; font-size:1rem; outline:none;
 }
 .login-input:focus{ border-color:rgba(91,156,255,.6); box-shadow:0 0 0 3px rgba(91,156,255,.16); }
+.login-input.invalid{ border-color:#b94d57; box-shadow:0 0 0 3px rgba(185,77,87,.22); background:#241417; }
+.field-error{ color:#ff9aa6; font-size:.85rem; line-height:1.3; margin-top:6px; padding-left:2px; }
+
 .login-error{
   background:#3b1f26; border:1px solid #6b2a39; color:#ffb4c8;
   border-radius:14px; padding:10px 12px;
@@ -107,67 +117,28 @@ body{ margin:0; background:var(--bg); color:var(--text); }
 .login-footer{ padding:12px 40px 36px; display:flex; justify-content:center; }
 .login-hint{ color:var(--muted); font-size:.95rem; }
 
-/* Desktop scaling */
 @media (min-width:1200px){
   .login-title{ font-size:2.2rem; }
   .login-input{ font-size:1.05rem; padding:16px 18px; }
   .login-button{ font-size:1.05rem; padding:16px 20px; }
 }
 
-/* Accessibility: reduced motion fallback for GIF (currently not used) */
+/* Reduced motion fallback for GIF */
 @media (prefers-reduced-motion: reduce){
   .login-hero::before{ background-image:url("/bg-still.jpg"); }
 }
 
-
-/* --- NavBar: edge-to-edge brand left, buttons right --- */
-.nav-inner{
-  max-width: none !important;
-  width: 100% !important;
-  padding: 80 !important;
-  justify-content: space-between !important;
-}
-
-.nav-links{
-  margin-left: auto !important; /* push links to the far right */
-}
-
-/* If your brand has inherent padding/margins, neutralize them */
-.brand{
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* --- Login field highlights --- */
-/* Inline validation */
-.login-input.invalid{
-  border-color:#b94d57;
-  box-shadow:0 0 0 3px rgba(185,77,87,.22);
-  background:#241417;
-}
-.field-error{
-  color:#ff9aa6;
-  font-size:.85rem;
-  line-height:1.3;
-  margin-top:6px;
-  padding-left:2px;
-}
-
-
-
-/*  THIS SECTION BELOW MAY DISAPPEAR PENDING HOW THE PAGES WORK.*/
-
 /* ===== Dashboard layout ===== */
 .dash{
   display:grid;
-  grid-template-columns: 320px minmax(0, 1fr); /* sidebar + main */
+  grid-template-columns: 320px minmax(0, 1fr);
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px 16px 28px;
 }
 
-/* Sidebar (left ~1/3 visually) */
+/* Sidebar */
 .dash-sidebar{
   background: var(--card);
   border: 1px solid var(--border);
@@ -179,8 +150,7 @@ body{ margin:0; background:var(--bg); color:var(--text); }
 }
 .dash-title{ margin: 4px 0 8px; font-size: 1.1rem; }
 .games-list{
-  list-style: none;
-  padding: 0; margin: 8px 0 16px;
+  list-style: none; padding: 0; margin: 8px 0 16px;
   display: grid; gap: 8px;
 }
 .games-list li{
@@ -190,14 +160,14 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   padding: 8px 10px;
 }
 .view-all{
-  margin-top: auto; /* stick to bottom of the sidebar */
+  margin-top: auto;
   text-align: center;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: transparent;
 }
 
-/* Main area (right 2/3) */
+/* Main */
 .dash-main{
   display: grid;
   grid-template-rows: auto 1fr;
@@ -205,11 +175,8 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   min-width: 0;
 }
 .dash-header{
-  display:flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 12px; padding: 12px 16px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -218,8 +185,7 @@ body{ margin:0; background:var(--bg); color:var(--text); }
 
 /* Servers grid */
 .servers-grid{
-  display:grid;
-  gap:16px;
+  display:grid; gap:16px;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   align-content: start;
 }
@@ -233,14 +199,12 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   gap: 10px;
 }
 .server-top{
-  display:flex; align-items:center; justify-content:space-between;
-  gap: 8px;
+  display:flex; align-items:center; justify-content:space-between; gap: 8px;
 }
 .server-name{ margin: 0; font-size: 1.05rem; }
 .status-pill{
   padding: 4px 10px; border-radius: 999px; font-size: .85rem;
-  border: 1px solid var(--border);
-  text-transform: capitalize;
+  border: 1px solid var(--border); text-transform: capitalize;
 }
 .status-pill.online{  color:#8fd18f; border-color:#335a33; background:rgba(51,90,51,.18); }
 .status-pill.offline{ color:#ffb4c8; border-color:#6b2a39; background:#3b1f26; }
@@ -251,32 +215,20 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   grid-template-columns: repeat(3, minmax(0,1fr));
 }
 .meta-label{
-  color: var(--muted);
-  font-size: .8rem;
-  margin-right: 6px;
-  display: inline-block;
-  width: 56px;
+  color: var(--muted); font-size: .8rem; margin-right: 6px;
+  display: inline-block; width: 56px;
 }
-.server-actions{
-  display:flex; justify-content:flex-end; gap:8px;
-}
+.server-actions{ display:flex; justify-content:flex-end; gap:8px; }
 
 /* Buttons */
 .btn.primary{
   background: linear-gradient(180deg, var(--brand), #4a86e6);
-  color: #0a1020;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
+  color: #0a1020; border: none; padding: 10px 14px;
+  border-radius: 12px; cursor: pointer;
 }
 
-/* Responsive: stack sidebar below on small screens */
+/* Responsive: stack sidebar under main on small screens */
 @media (max-width: 900px){
-  .dash{
-    grid-template-columns: 1fr;
-  }
-  .dash-sidebar{
-    min-height: auto;
-  }
+  .dash{ grid-template-columns: 1fr; }
+  .dash-sidebar{ min-height: auto; }
 }
