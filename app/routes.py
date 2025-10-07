@@ -46,7 +46,7 @@ def login():
     print(f'Welcome Tech-Priest {user}...')
     #return jsonify({"Status": f'The Machine Spirit is pleased, Login Successful. Praise the Omnissiah!'})
 
-    session.clear()
+    #session.clear()
     session["uid"] = user.id
     return jsonify({
         "Status": "Login Successful",
@@ -78,6 +78,10 @@ def logout():
 
 @bp.route("/api/dashboard", methods=["GET", "PATCH", "POST"])
 def dashboard():
+    if "uid" not in session:
+        print("Unauthorized Access attempted. Machine Spirit denies communion.")
+        return jsonify({"Status": "Unauthorized Access"}), 401
+
     print("The sacred cogs turn. All servers hum in obedience, ready for manipulation by the anointed.")
     servers = GameServer.query.all()
     return jsonify({
