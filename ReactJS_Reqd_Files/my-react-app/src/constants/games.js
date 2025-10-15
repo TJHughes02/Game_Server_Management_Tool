@@ -1,0 +1,1 @@
+// this is for the games list (shared between CreateServer)
