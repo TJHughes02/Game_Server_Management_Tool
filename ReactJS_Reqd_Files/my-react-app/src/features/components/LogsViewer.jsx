@@ -1,0 +1,1 @@
+// scrollable/tailing logs area (may not be used but want this feature)

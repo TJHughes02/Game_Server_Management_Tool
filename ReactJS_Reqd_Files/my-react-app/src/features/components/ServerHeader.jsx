@@ -1,0 +1,1 @@
+// title, status, actions on detail page
