@@ -88,7 +88,7 @@ def dashboard():
         "ok": True,
         "Servers": [s.to_dict() for s in servers]
     }), 200
-
+# need to get the right route
 @bp.route("/api/servers", methods=["POST"])
 def new_server():
     data = request.get_json()

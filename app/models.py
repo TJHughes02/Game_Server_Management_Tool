@@ -42,6 +42,9 @@ class GameServer(db.Model):
     archive_path        = db.Column(db.String(255), nullable=True)
     backup_path         = db.Column(db.String(255), nullable=True)
 
+    rcon_config = db.relationship("RconConfig", back_populates="server", uselist=False, cascade="all, delete-orphan")
+    server_info = db.relationship("ServerInfo", back_populates="server", uselist=False, cascade="all, delete-orphan")
+
 
     def __repr__(self):
         return f"<GameServer {self.id}; {self.name}>"
@@ -64,6 +67,8 @@ class RconConfig(db.Model):
     java_path           = db.Column(db.String(255), nullable=False)
     steam_cmd_path      = db.Column(db.String(255), nullable=False)
 
+    server = db.relationship("GameServer", back_populates="rcon_config")
+
 #Server Info table
 class ServerInfo(db.Model):
     __tablename__       = 'server_info'
@@ -72,16 +77,7 @@ class ServerInfo(db.Model):
     stopped_at          = db.Column(db.DateTime, nullable=True)
     notes               = db.Column(db.Text, nullable=True)
 
+    server = db.relationship("GameServer", back_populates="server_info")
+
     def __repr__(self):
         return f"<ServerInfo {self.id}>"
-
-'''
-#may change pending ERD and Relational Schema rework
-class NodeUser(db.Model):
-    __tablename__ = 'node_user'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("servers.id"), nullable=False)
-
-    def __repr__(self):
-        return f"<NodeUser {self.id}>"
-'''
