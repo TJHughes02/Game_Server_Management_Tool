@@ -58,13 +58,13 @@ def login():
 def me():
     uid = session.get("uid")
     if not uid:
-        return jsonify({"authenticated": False}), 200
+        return jsonify({"Authenticated": False}), 200
     user = User.query.get(uid)
     if not user:
         session.clear()
-        return jsonify({"authenticated": False}), 200
+        return jsonify({"Authenticated": False}), 200
     return jsonify({
-        "authenticated": True,
+        "Authenticated": True,
         "user": {"id": user.id, "display_name": user.display_name}
     }), 200
 
@@ -73,7 +73,7 @@ def me():
 def logout():
     print("Communion with the Machine Spirit severed. All sacred rites concluded. User egress complete.", flush= True)
     session.clear()
-    return jsonify({"ok": True}), 200
+    return jsonify({"Communion Ended": True}), 200
 
 
 @bp.route("/api/dashboard", methods=["GET", "PATCH", "POST"])
@@ -86,5 +86,5 @@ def dashboard():
     servers = GameServer.query.all()
     return jsonify({
         "ok": True,
-        "servers": [s.to_dict() for s in servers]
+        "Servers": [s.to_dict() for s in servers]
     }), 200
