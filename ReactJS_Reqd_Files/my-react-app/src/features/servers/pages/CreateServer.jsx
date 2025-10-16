@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+
 /**
  * RCON-friendly games you plan to support (extend anytime).
  * key = stable id you’ll also use on the backend
