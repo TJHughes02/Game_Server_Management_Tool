@@ -88,3 +88,20 @@ def dashboard():
         "ok": True,
         "Servers": [s.to_dict() for s in servers]
     }), 200
+
+@bp.route("/api/servers", methods=["POST"])
+def new_server():
+    data = request.get_json()
+    new_server = GameServer(
+        display_name=data.get('display_name'),
+        game_type = data.get('game_type'),
+        status = data.get('status', "Offline"),
+        server_port = data.get('server_port'),
+        install_path = data.get('install_path'),
+        archive_path = data.get('archive_path'),
+        backup_path = data.get('backup_path'),
+    )
+    db.session.add(new_server)
+    db.session.commit()
+    print("The sacred cogs whirl. A new server awakens, brought forth by the anointed Tech-Priest.")
+    return jsonify({"Server Awakened": True, "Server": new_server.to_dict()}), 200
