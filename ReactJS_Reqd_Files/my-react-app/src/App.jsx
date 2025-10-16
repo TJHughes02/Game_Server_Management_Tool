@@ -2,10 +2,11 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
-import NavBar from './components/NavBar.jsx'
 import Games from './pages/Games.jsx'
-import CreateServer from './pages/CreateServer.jsx'
+import CreateServer from "./features/servers/pages/CreateServer.jsx"
+import NavBar from './components/NavBar.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
