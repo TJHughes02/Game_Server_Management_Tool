@@ -1,41 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { GAMES, GAME_DEFAULTS, GAME_EXTRAS } from '/src/constants/games.js'
 
-
-/**
- * RCON-friendly games you plan to support (extend anytime).
- * key = stable id you’ll also use on the backend
- */
-const GAMES = [
-    { key: 'minecraft', label: 'Minecraft (Java Edition)' },
-    { key: 'rust', label: 'Rust' },
-    { key: 'ark', label: 'ARK: Survival Evolved' },
-    { key: 'csgo', label: 'Counter-Strike: Global Offensive' },
-    { key: 'factorio', label: 'Factorio' },
-]
-// THIS PART ABOVE WILL BE CHANGED TO BE ABLE TO BE CHANGED IN 1 FILE AND
-// SYNC BETWEEN MULTIPLE e.g. list.jsx will include the games and games and this file
-// will be able to display the games depending on what is in list.
-
-/**
- * Game defaults + extra fields.
- * Each field object: { name, label, type, required?, placeholder?, help? }
- * Keep baseFields small and generic; add per-game extras as needed.
- */
-const GAME_CONFIG = {
-    // defaults for shared fields per game (server & rcon ports differ by title)
-    defaults: {
-        minecraft: { serverPort: 25565, rconPort: 25575 },
-        rust: { serverPort: 28015, rconPort: 28016 },
-        ark: { serverPort: 7777, rconPort: 27020, queryPort: 27015 },
-        csgo: { serverPort: 27015, rconPort: 27015 },
-        factorio: { serverPort: 34197, rconPort: 27015 },
-    },
-    // extra per-game fields (optional but want to put in)
-    extras: {
-        // will add soon
-    },
-}
 
 /** Base fields required for ANY server */
 const BASE_FIELDS = [
@@ -45,38 +11,40 @@ const BASE_FIELDS = [
     { name: 'serverPort', label: 'Server port', type: 'number', required: true },
     { name: 'rconPort', label: 'RCON port', type: 'number', required: true },
     { name: 'rconPass', label: 'RCON password', type: 'password', required: true },
-    // Optional but common on Source/Steam titles:
     { name: 'queryPort', label: 'Query port', type: 'number', required: false, placeholder: 'optional' },
 ]
 
 export default function CreateServer() {
     const nav = useNavigate()
 
-    // initial form state
+    // initialize with first game’s defaults (if present)
+    const defaultGame = GAMES[0]?.key ?? 'minecraft'
+    const d = GAME_DEFAULTS[defaultGame] || {}
+
     const [form, setForm] = useState({
         name: '',
-        game: GAMES[0].key, // default to first game
+        game: defaultGame,
         host: 'localhost',
-        serverPort: '',
-        rconPort: '',
+        serverPort: d.serverPort ?? '',
+        rconPort: d.rconPort ?? '',
         rconPass: '',
-        queryPort: '',
+        queryPort: d.queryPort ?? '',
     })
     const [touched, setTouched] = useState({})
 
-    // derive schema: base + extras for selected game
+    // extras for current grame come from constants
     const extras = GAME_CONFIG.extras[form.game] || []
-    const schema = useMemo(() => [...BASE_FIELDS, ...extras], [form.game])
+    const schema = useMemo(() => [...BASE_FIELDS, ...extras], [form.game, extras])
 
     // when game changes, prefill sensible defaults for ports (without clobbering typed values)
     function handleGameChange(nextGame) {
-        const d = GAME_CONFIG.defaults[nextGame] || {}
+        const nd = GAME_DEFAULTS[nextGame] || {}
         setForm(prev => ({
             ...prev,
             game: nextGame,
-            serverPort: prev.serverPort || d.serverPort || '',
-            rconPort: prev.rconPort || d.rconPort || '',
-            queryPort: prev.queryPort || d.queryPort || '',
+            serverPort: prev.serverPort || nd.serverPort || '',
+            rconPort: prev.rconPort || nd.rconPort || '',
+            queryPort: prev.queryPort || nd.queryPort || '',
         }))
     }
 
@@ -90,40 +58,32 @@ export default function CreateServer() {
     // simple required validation
     const errors = {}
     schema.forEach(f => {
-        if (f.required && !String(form[f.name] ?? '').trim()) {
-            errors[f.name] = 'Required'
-        }
+        if (f.required && !String(form[f.name] ?? '').trim()) errors[f.name] = 'Required'
     })
     const hasErrors = Object.keys(errors).length > 0
 
     async function handleSubmit(e) {
         e.preventDefault()
-        // mark everything as touched so errors show
         const allTouched = {}
         schema.forEach(f => { allTouched[f.name] = true })
         setTouched(allTouched)
-
         if (hasErrors) return
 
-        // Build a payload that’s easy to extend on the backend later.
         const payload = {
             name: form.name,
             game: form.game,
             connection: {
                 host: form.host,
                 serverPort: Number(form.serverPort),
-                rcon: {
-                    port: Number(form.rconPort),
-                    password: form.rconPass,
-                },
+                rcon: { port: Number(form.rconPort), password: form.rconPass },
                 queryPort: form.queryPort ? Number(form.queryPort) : undefined,
             },
-            // 
+            extras: (GAME_EXTRAS[form.game] || []).reduce((acc, f) => {
+                acc[f.name] = form[f.name] ?? ''
+                return acc
+            }, {}),
         }
 
-        // TODO: later  POST to your Flask endpoint
-
-        // For now, just navigate back to dashboard and pass state or show a toast
         console.log('Create server payload:', payload)
         nav('/dashboard')
     }
@@ -133,7 +93,6 @@ export default function CreateServer() {
             <h1>Create Server</h1>
 
             <form onSubmit={handleSubmit} noValidate>
-                {/* Base + dynamic fields */}
                 {schema.map(field => {
                     const val = form[field.name] ?? ''
                     const err = touched[field.name] && field.required && !String(val).trim()
@@ -150,7 +109,9 @@ export default function CreateServer() {
                                     onChange={e => handleGameChange(e.target.value)}
                                     onBlur={() => markTouched('game')}
                                 >
-                                    {GAMES.map(g => <option key={g.key} value={g.key}>{g.label}</option>)}
+                                    {GAMES.map(g => (
+                                        <option key={g.key} value={g.key}>{g.label}</option>
+                                    ))}
                                 </select>
                             ) : (
                                 <input
@@ -169,13 +130,11 @@ export default function CreateServer() {
                     )
                 })}
 
-                {/* Actions */}
                 <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
                     <button type="submit">Create server</button>
                     <button type="button" onClick={() => nav(-1)}>Cancel</button>
                 </div>
 
-                {/* (Optional) quick debug preview so you can see what will be sent */}
                 <details style={{ marginTop: 16 }}>
                     <summary>Preview payload</summary>
                     <pre>{JSON.stringify({
@@ -187,7 +146,7 @@ export default function CreateServer() {
                             rcon: { port: form.rconPort, password: form.rconPass },
                             queryPort: form.queryPort,
                         },
-                        extras: (GAME_CONFIG.extras[form.game] || []).reduce((acc, f) => { acc[f.name] = form[f.name] ?? ''; return acc }, {}),
+                        extras: (GAME_EXTRAS[form.game] || []).reduce((acc, f) => { acc[f.name] = form[f.name] ?? ''; return acc }, {}),
                     }, null, 2)}</pre>
                 </details>
             </form>

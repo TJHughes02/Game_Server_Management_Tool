@@ -1,39 +1,35 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { GAMES } from '../constants/games.js'
 
 export default function Dashboard() {
   const { user } = useAuth()
   const nav = useNavigate()
 
-    async function handleLogout() { // no currently used yet, may be removed
-        logout()
-        nav('/login')
-    }
 
-// THIS ENTIRE SECTION BELOW IS TEMPORARTY AND ONLY A TEMPLATE. MOST OF THIS WILL NOT BE USED
-// IN THE FINAL PRODUCT.
+  // THIS ENTIRE SECTION BELOW IS TEMPORARTY AND ONLY A TEMPLATE. MOST OF THIS WILL NOT BE USED
+  // IN THE FINAL PRODUCT.
 
 
-// Template servers (placeholder until your create-server flow exists)
+  // Template servers (placeholder until your create-server flow exists)
   const servers = [
-    { id: 1, name: 'Survival SMP', game: 'Minecraft', status: 'online',  players: '3/20',  uptime: '2h 14m' },
-    { id: 2, name: 'PvP Arena',    game: 'Rust',      status: 'offline', players: '0/50',  uptime: '—' },
-    { id: 3, name: 'Island Base',  game: 'ARK',       status: 'starting',players: '—',     uptime: '—' },
-    { id: 4, name: 'Modded SMP',   game: 'Minecraft', status: 'offline',players: '0/10',     uptime: '—' },
+    { id: 1, name: 'Survival SMP', game: 'Minecraft', status: 'online', players: '3/20', uptime: '2h 14m' },
+    { id: 2, name: 'PvP Arena', game: 'Rust', status: 'offline', players: '0/50', uptime: '—' },
+    { id: 3, name: 'Island Base', game: 'ARK', status: 'starting', players: '—', uptime: '—' },
+    { id: 4, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
   ]
 
-return (
+  return (
     <main className="page">
       <div className="dash">
-        {/* Left 1/3 — compatible games (examples only) */}
+        {/* Left 1/3 — compatible games (driven by constants/games.js) */}
         <aside className="dash-sidebar">
           <h2 className="dash-title">Compatible games</h2>
           <p className="muted">Examples (RCON):</p>
           <ul className="games-list">
-            <li>Minecraft</li>
-            <li>Rust</li>
-            <li>ARK: Survival Evolved</li>
-            <li>CS:GO</li>
+            {GAMES.slice(0, 4).map(g => (
+              <li key={g.key}>{g.label}</li>
+            ))}
           </ul>
 
           <Link to="/games" className="btn view-all">View all compatible games</Link>
