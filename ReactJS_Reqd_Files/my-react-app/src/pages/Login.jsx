@@ -17,6 +17,7 @@ export default function Login() {
   useEffect(() => {
     //fetch('/api/health')
     http.get('/api/health')
+    //console.log("DO YOU KNOW WHAT YOURE DOING BECUASE I DONT THINK IT ACTUALLY HITS THE BLOCK!")
       .then(r => (r.ok ? r.json() : Promise.reject()))
      .then(() => setBackendStatus('ok'))
       .catch(() => setBackendStatus('down'))

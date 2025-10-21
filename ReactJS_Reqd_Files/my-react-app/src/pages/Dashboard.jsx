@@ -21,6 +21,14 @@ export default function Dashboard() {
     { id: 6, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
     { id: 7, name: 'Modded SMP', game: 'Minecraft', status: 'starting', players: '0/10', uptime: '—' },
     { id: 8, name: 'Modded SMP', game: 'Minecraft', status: 'online', players: '0/10', uptime: '—' },
+    { id: 9, name: 'Survival SMP', game: 'Minecraft', status: 'online', players: '3/20', uptime: '2h 14m' },
+    { id: 10, name: 'PvP Arena', game: 'Rust', status: 'offline', players: '0/50', uptime: '—' },
+    { id: 11, name: 'Island Base', game: 'ARK', status: 'starting', players: '—', uptime: '—' },
+    { id: 12, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
+    { id: 13, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
+    { id: 14, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
+    { id: 15, name: 'Modded SMP', game: 'Minecraft', status: 'starting', players: '0/10', uptime: '—' },
+    { id: 16, name: 'Modded SMP', game: 'Minecraft', status: 'online', players: '0/10', uptime: '—' },
   ]
 
   return (

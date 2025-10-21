@@ -34,7 +34,7 @@ export default function App() {
         <NavBar />
         <Routes>
           {/* Public */}
-          <Route path="/" element={<Home />} />
+          {/*<Route path="/" element={<Home />} /> COMMENTED OUT TEMPORARILLY, WILL REMOVE IN FUTURE*/}
           <Route path="/login" element={<Login />} />
           <Route path="/games" element={<Games />} />
 
