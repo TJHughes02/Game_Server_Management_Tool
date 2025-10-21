@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session
-from . import db
+from . import db, utils
 from .models import User, GameServer
 
 bp = Blueprint("routes", __name__)
@@ -89,19 +89,17 @@ def dashboard():
         "Servers": [s.to_dict() for s in servers]
     }), 200
 # need to get the right route
-@bp.route("/api/servers", methods=["POST"])
+@bp.route("/api/servers/new", methods=["POST"])
 def new_server():
     data = request.get_json()
-    new_server = GameServer(
-        display_name=data.get('display_name'),
-        game_type = data.get('game_type'),
-        status = data.get('status', "Offline"),
-        server_port = data.get('server_port'),
-        install_path = data.get('install_path'),
-        archive_path = data.get('archive_path'),
-        backup_path = data.get('backup_path'),
-    )
-    db.session.add(new_server)
-    db.session.commit()
-    print("The sacred cogs whirl. A new server awakens, brought forth by the anointed Tech-Priest.")
-    return jsonify({"Server Awakened": True, "Server": new_server.to_dict()}), 200
+    try:
+        new_server = utils.create_new_server(data)
+        db.session.add(new_server)
+        db.session.commit()
+        print("The sacred cogs whirl. A new server awakens, brought forth by the anointed Tech-Priest.")
+        return jsonify({"Server Awakened": True, "Server": new_server.to_dict()}), 200
+
+    except Exception:
+        db.session.rollback()
+        print("Heretical error: New server dissipates back into the ether!")
+        return jsonify({"Error": "Server Creation Failed"}), 500

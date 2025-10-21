@@ -41,7 +41,8 @@ class GameServer(db.Model):
     id                  = db.Column(db.Integer, primary_key=True)
     name                = db.Column(db.String(120), nullable=False)
     game_type           = db.Column(db.String(120), nullable=False)
-    status              = db.Column(db.Enum("Online", "Offline", "Updating", "Starting", "Stopping", name="server_status"), nullable=False)
+    status              = db.Column(db.Enum("Online", "Offline", "Updating", "Starting", "Stopping",
+                                            name="server_status"), nullable=False, default="Offline")
     server_port         = db.Column(db.Integer, nullable=False)
     install_path        = db.Column(db.String(255), nullable=False)
     archive_path        = db.Column(db.String(255), nullable=True)
