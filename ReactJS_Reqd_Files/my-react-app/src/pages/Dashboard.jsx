@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
-import { GAMES } from '../constants/games.js'
+import { GAMES } from '@/constants/games.js'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -17,6 +17,10 @@ export default function Dashboard() {
     { id: 2, name: 'PvP Arena', game: 'Rust', status: 'offline', players: '0/50', uptime: '—' },
     { id: 3, name: 'Island Base', game: 'ARK', status: 'starting', players: '—', uptime: '—' },
     { id: 4, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
+    { id: 5, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
+    { id: 6, name: 'Modded SMP', game: 'Minecraft', status: 'offline', players: '0/10', uptime: '—' },
+    { id: 7, name: 'Modded SMP', game: 'Minecraft', status: 'starting', players: '0/10', uptime: '—' },
+    { id: 8, name: 'Modded SMP', game: 'Minecraft', status: 'online', players: '0/10', uptime: '—' },
   ]
 
   return (
@@ -27,7 +31,7 @@ export default function Dashboard() {
           <h2 className="dash-title">Compatible games</h2>
           <p className="muted">Examples (RCON):</p>
           <ul className="games-list">
-            {GAMES.slice(0, 4).map(g => (
+            {GAMES.slice(0, 7).map(g => ( // (leave this number, increase/decrease for list size)
               <li key={g.key}>{g.label}</li>
             ))}
           </ul>

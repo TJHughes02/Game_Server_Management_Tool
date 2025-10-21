@@ -3,9 +3,14 @@ import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Games from './pages/Games.jsx'
-import CreateServer from "./features/servers/pages/CreateServer.jsx"
+//import CreateServer from "./features/servers/pages/CreateServer.jsx"
 import NavBar from './components/NavBar.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+
+
+import CreateServer from './features/servers/pages/CreateServer.jsx'
+import ServersList from './features/servers/pages/ServersList.jsx'
+import ServerDetail from './features/servers/pages/ServerDetail.jsx'
 
 
 function ProtectedRoute({ children }) {
@@ -29,19 +34,19 @@ export default function App() {
           {/* Protected */}
           <Route
             path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
+          />
+          <Route
+            path="/servers"
+            element={<ProtectedRoute><ServersList /></ProtectedRoute>}
           />
           <Route
             path="/servers/new"
-            element={
-              <ProtectedRoute>
-                <CreateServer />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute><CreateServer /></ProtectedRoute>}
+          />
+          <Route
+            path="/servers/:id"
+            element={<ProtectedRoute><ServerDetail /></ProtectedRoute>}
           />
 
           {/* Returns 404 */}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GAMES, GAME_DEFAULTS, GAME_EXTRAS } from '/src/constants/games.js'
+import { GAMES, GAME_DEFAULTS, GAME_EXTRAS } from '@/constants/games.js'
 
 
 /** Base fields required for ANY server */
@@ -20,6 +20,7 @@ export default function CreateServer() {
     // initialize with first game’s defaults (if present)
     const defaultGame = GAMES[0]?.key ?? 'minecraft'
     const d = GAME_DEFAULTS[defaultGame] || {}
+     console.log('CreateServer mounted') 
 
     const [form, setForm] = useState({
         name: '',
@@ -33,8 +34,11 @@ export default function CreateServer() {
     const [touched, setTouched] = useState({})
 
     // extras for current grame come from constants
-    const extras = GAME_CONFIG.extras[form.game] || []
-    const schema = useMemo(() => [...BASE_FIELDS, ...extras], [form.game, extras])
+    //const extras = GAME_CONFIG.extras[form.game] || []
+    //const schema = useMemo(() => [...BASE_FIELDS, ...extras], [form.game, extras])
+
+    const extras = GAME_EXTRAS[form.game] || []
+    const schema = [...BASE_FIELDS, ...extras]
 
     // when game changes, prefill sensible defaults for ports (without clobbering typed values)
     function handleGameChange(nextGame) {

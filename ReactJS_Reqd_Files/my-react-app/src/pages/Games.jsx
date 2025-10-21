@@ -1,4 +1,4 @@
-import { GAMES } from '../constants/games.js'
+import { GAMES } from '@/constants/games.js'
 
 export default function Games() {
   return (
