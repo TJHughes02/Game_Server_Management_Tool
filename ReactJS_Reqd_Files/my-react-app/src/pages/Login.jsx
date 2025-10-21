@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext.jsx' 
+import { useAuth } from '../context/AuthContext.jsx'
+import { http } from '@/services/http'
 
 export default function Login() {
   const [displayName, setDisplayName] = useState('')
@@ -14,9 +15,10 @@ export default function Login() {
   const { setUser } = useAuth()
 
   useEffect(() => {
-    fetch('/api/health')
+    //fetch('/api/health')
+    http.get('/api/health')
       .then(r => (r.ok ? r.json() : Promise.reject()))
-      .then(() => setBackendStatus('ok'))
+     .then(() => setBackendStatus('ok'))
       .catch(() => setBackendStatus('down'))
   }, [])
 
@@ -49,10 +51,14 @@ export default function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ display_name: displayName, password })
       })
-      const data = await res.json().catch(() => ({}))
+      //const data = await res.json().catch(() => ({}))
 
-      if (!res.ok) throw new Error(data.Status || 'Login failed')
-      if (!data.user) throw new Error('No user returned from server')
+      //if (!res.ok) throw new Error(data.Status || 'Login failed')
+      //if (!data.user) throw new Error('No user returned from server')
+      const data = await http.post('/api/login', {
+        display_name: displayName, password
+      })
+      if (!data?.user) throw new Error('No user returned from server')
 
       localStorage.setItem('authUser', JSON.stringify(data.user))
       setUser(data.user)
@@ -67,7 +73,7 @@ export default function Login() {
   //const canSubmit = displayName.trim() && password
 
   // for the username section, we might only use 'username' instead of email, unsure about this for now.
-   return (
+  return (
     <main className="page login-hero">
       <div className="login-card">
         <div className="login-header">

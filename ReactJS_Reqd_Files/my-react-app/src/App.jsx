@@ -13,10 +13,17 @@ import ServersList from './features/servers/pages/ServersList.jsx'
 import ServerDetail from './features/servers/pages/ServerDetail.jsx'
 
 
+//function ProtectedRoute({ children }) {
+  //const { user } = useAuth()
+  //return user ? children : <Navigate to="/login" replace />
+//}
+
 function ProtectedRoute({ children }) {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
+  if (loading) return <main className="page"><p>Loading…</p></main>
   return user ? children : <Navigate to="/login" replace />
 }
+
 
 // top portion is unprotected (not locked behind login) <Route>
 // bottom portion is protected (locked behind login) <ProtectedRoute>
