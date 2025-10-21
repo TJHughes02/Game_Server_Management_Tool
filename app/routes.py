@@ -93,13 +93,15 @@ def dashboard():
 def new_server():
     data = request.get_json()
     try:
-        new_server = utils.create_new_server(data)
-        db.session.add(new_server)
+        newest_server = utils.create_new_server(data)
+        newest_server.rcon_config = utils.create_new_server_rcon_config(data)
+        newest_server.server_info = utils.create_new_server_info(data)
+        db.session.add(newest_server)
         db.session.commit()
         print("The sacred cogs whirl. A new server awakens, brought forth by the anointed Tech-Priest.")
         return jsonify({"Server Awakened": True, "Server": new_server.to_dict()}), 200
 
-    except Exception:
+    except Exception as e:
         db.session.rollback()
         print("Heretical error: New server dissipates back into the ether!")
         return jsonify({"Error": "Server Creation Failed"}), 500
