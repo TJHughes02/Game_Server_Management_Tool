@@ -1,1 +1,65 @@
-// not sure if this will be used but included in file sturcture
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_API === 'true'
+const API_BASE = import.meta.env.VITE_API_BASE || '' //'' when using Vite proxy
+
+let _mockReq
+async function mockRequest(method, url, opts) {
+  if (!_mockReq) {
+    _mockReq = (await import('../mocks/handlers.js')).mockRequest
+  }
+  return _mockReq(method, url, opts)
+}
+
+function buildUrl(url, params) {
+  if (!params) return url
+  const qs = new URLSearchParams(params).toString()
+  return `${url}${url.includes('?') ? '&' : '?'}${qs}` //
+}
+
+async function realRequest(method, url, { params, body, headers, signal } = {}) {
+  const full = API_BASE + buildUrl(url, params)
+  const res = await fetch(full, {
+    method,
+    credentials: 'include',
+    headers: {
+      ...(body != null ? { 'Content-Type': 'application/json' } : {}),
+      ...(headers || {}),
+    },
+    body: body != null ? JSON.stringify(body) : undefined,
+    signal,
+  })
+
+  const text = await res.text()
+  let data = null
+  if (text) {
+    try { data = JSON.parse(text) } catch { data = text }
+  }
+
+  if (!res.ok) {
+    const message =
+      (data && data.message) ||
+      (data && data.error) ||
+      (typeof data === 'string' ? data : '') ||
+      res.statusText ||
+      'Request failed'
+    const err = new Error(message)
+    err.status = res.status
+    err.body = data
+    throw err
+  }
+  return data
+}
+
+async function request(method, url, opts) {
+  if (USE_MOCK) return mockRequest(method, url, opts)
+  return realRequest(method, url, opts)
+}
+
+export const http = {
+  get: (url, opts) => request('GET', url, opts),
+  post: (url, body, opts = {}) => request('POST', url, { ...opts, body }),
+  patch: (url, body, opts = {}) => request('PATCH', url, { ...opts, body }),
+  del: (url, opts) => request('DELETE', url, opts),
+}
+
+// create additional notes as to what this does
+// 
