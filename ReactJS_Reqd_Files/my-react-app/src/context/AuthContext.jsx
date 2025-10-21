@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { http } from '@/services/http'
 
 const AuthCtx = createContext(null)
 
@@ -11,11 +12,21 @@ export function AuthProvider({ children }) {
       .then(r => r.ok ? r.json() : { authenticated: false })
       .then(d => { if (d.authenticated && d.user) setUser(d.user) })
       .finally(() => setLoading(false))
+      // added 10.20.25
+      ; (async () => {
+        try {
+          const d = await http.get('/api/me')
+          if (d?.authenticated && d.user) setUser(d.user)
+        } finally {
+          setLoading(false)
+        }
+      })()
   }, [])
 
   async function logout() {
     try {
       await fetch('/api/logout', { method: 'POST', credentials: 'include' })
+      await http.post('/api/logout', {})
     } finally {
       setUser(null)
     }
@@ -38,3 +49,6 @@ export function useAuth() {
 // FINSHED 9.28.25
 // ADDED HELPER FOR LOGOUT LOGIC. THIS SHOULD NOT NEED TO BE TOUCHED AFTER THIS.
 // FINISHED 10.6.25
+// ADDED HTTP CALLS FROM SERVICES HTTPAPI. THIS IS THE NEW WAY OF HANDLING
+// API CALLS IN THE FRONT-END FOR SERVERS AND LOGIN RELATED THINGS
+// FINISHED 10.20.25
