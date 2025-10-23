@@ -24,7 +24,7 @@ export default function NavBar() {
         <Link to="/" className="brand">Game Server Management Tool</Link>
 
         <nav className="nav-links">
-          <NavLink to="/" className="link">Home</NavLink>
+          {/*<NavLink to="/" className="link">Home</NavLink>*/}
           <NavLink to="/games" className="link">Games</NavLink>
           {user && <NavLink to="/dashboard" className="link">Dashboard</NavLink>}
 

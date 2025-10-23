@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
-import { http } from '@/services/http'
+import { http } from '@/services/http.js'
 
 export default function Login() {
   const [displayName, setDisplayName] = useState('')
@@ -15,11 +15,8 @@ export default function Login() {
   const { setUser } = useAuth()
 
   useEffect(() => {
-    //fetch('/api/health')
     http.get('/api/health')
-    //console.log("DO YOU KNOW WHAT YOURE DOING BECUASE I DONT THINK IT ACTUALLY HITS THE BLOCK!")
-      .then(r => (r.ok ? r.json() : Promise.reject()))
-     .then(() => setBackendStatus('ok'))
+      .then(() => setBackendStatus('ok'))
       .catch(() => setBackendStatus('down'))
   }, [])
 
