@@ -19,9 +19,9 @@ export default function ServerDetail() {
   const [busy, setBusy] = useState(false)
   const [tab, setTab] = useState('overview')
 
-  // RCON state
+  // Console (RCON)
   const [cmd, setCmd] = useState('')
-  const [consoleLines, setConsoleLines] = useState([]) // [{ts, text, kind:'in'|'out'}]
+  const [consoleLines, setConsoleLines] = useState([]) // {ts, kind:'in'|'out', text}
 
   // Logs polling
   const [logs, setLogs] = useState([])
@@ -34,7 +34,7 @@ export default function ServerDetail() {
     []
   )
 
-  async function fetchServer() {
+  async function load() {
     try {
       setLoading(true)
       const res = await http.get(`/api/servers/${id}`)
@@ -47,26 +47,26 @@ export default function ServerDetail() {
     }
   }
 
-  useEffect(() => { fetchServer() }, [id])
+  useEffect(() => { load() }, [id])
 
-  // Logs polling every 2s when Logs tab is active
+  // Logs: poll every 2s only while on the Logs tab
   useEffect(() => {
     if (tab !== 'logs') return
     let cancelled = false
     const tick = async () => {
       try {
-        const res = await http.get(`/api/servers/${id}/logs?cursor=${cursor}`)
+        const res = await http.get(`/api/servers/${id}/logs`, { params: { cursor } })
         if (!cancelled && res && Array.isArray(res.lines)) {
           setCursor(res.cursor ?? cursor)
           setLogs(prev => [...prev, ...res.lines])
         }
-      } catch { /* ignore */ }
+      } catch { /* ignore for now */ }
     }
     const i = setInterval(tick, 2000)
     return () => { cancelled = true; clearInterval(i) }
   }, [id, tab, cursor])
 
-  // Auto-scroll logs if follow enabled
+  // Auto-scroll logs when following
   useEffect(() => {
     if (follow && tab === 'logs' && logEndRef.current) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -75,12 +75,15 @@ export default function ServerDetail() {
 
   async function doAction(action) {
     if (busy) return
+    const confirmNeeded = action === 'stop' || action === 'restart'
+    if (confirmNeeded && !window.confirm(`Are you sure you want to ${action} this server?`)) return
+
     setBusy(true)
     try {
-      // optimistic blink to show activity
+      // light optimistic feedback
       setData(d => d ? { ...d, status: action === 'stop' ? 'stopping' : 'starting' } : d)
-      await http.post(`/api/servers/${id}/${action}`)
-      await fetchServer()
+      await http.post(`/api/servers/${id}/${action}`, {})
+      await load()
     } catch (e) {
       setError(e.message || `Failed to ${action}`)
     } finally {
@@ -93,8 +96,9 @@ export default function ServerDetail() {
     const text = cmd.trim()
     if (!text) return
     const ts = new Date().toLocaleTimeString()
-    setConsoleLines(prev => [...prev, { ts, kind: 'in', text: text }])
+    setConsoleLines(prev => [...prev, { ts, kind: 'in', text }])
     setCmd('')
+
     try {
       const res = await http.post(`/api/servers/${id}/rcon`, { command: text })
       const out = typeof res?.output === 'string' ? res.output : JSON.stringify(res)
@@ -109,22 +113,23 @@ export default function ServerDetail() {
   if (!data)   return <main className="page"><p>Not found.</p></main>
 
   const gameLabel = gameLabelByKey[data.game] || data.game
-  const playersText = data.players != null && data.maxPlayers != null
+  const playersText = (data.players != null && data.maxPlayers != null)
     ? `${data.players}/${data.maxPlayers}` : (data.players ?? '—')
 
   return (
     <main className="page">
+      {/* Header */}
       <div className="dash-header" style={{ marginBottom: 12 }}>
         <div>
           <h1 className="dash-greeting" style={{ marginBottom: 4 }}>{data.name}</h1>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display:'flex', gap:12, alignItems:'center', flexWrap:'wrap' }}>
             <span><strong>Game:</strong> {gameLabel}</span>
             <span className={`status-pill ${data.status}`}>{data.status}</span>
             <span><strong>Players:</strong> {playersText}</span>
             <span><strong>Uptime:</strong> {formatDuration(data.uptimeSec)}</span>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display:'flex', gap:8 }}>
           <button className="btn small" onClick={() => doAction('start')}   disabled={busy || data.status === 'online'}>Start</button>
           <button className="btn small" onClick={() => doAction('stop')}    disabled={busy || data.status === 'offline'}>Stop</button>
           <button className="btn small" onClick={() => doAction('restart')} disabled={busy}>Restart</button>
@@ -132,17 +137,17 @@ export default function ServerDetail() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <div style={{ display:'flex', gap:8, marginBottom:12 }}>
         {['overview','console','logs','settings'].map(t => (
           <button
             key={t}
             className={`btn small ${tab === t ? 'link active' : ''}`}
             onClick={() => setTab(t)}
           >
-            {t[0].toUpperCase()+t.slice(1)}
+            {t[0].toUpperCase() + t.slice(1)}
           </button>
         ))}
-        <div style={{ marginLeft: 'auto' }}>
+        <div style={{ marginLeft:'auto' }}>
           <Link to="/servers" className="link">← Back to servers</Link>
         </div>
       </div>
@@ -150,7 +155,7 @@ export default function ServerDetail() {
       {/* Panels */}
       {tab === 'overview' && (
         <section className="server-card">
-          <h3 style={{ marginTop: 0 }}>Overview</h3>
+          <h3 style={{ marginTop:0 }}>Overview</h3>
           <div style={{ display:'grid', gap:6, gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))' }}>
             <div><span className="meta-label">Host</span>{data.connection?.host ?? '—'}</div>
             <div><span className="meta-label">Server port</span>{data.connection?.serverPort ?? '—'}</div>
@@ -170,7 +175,7 @@ export default function ServerDetail() {
 
           {data.extras && Object.keys(data.extras).length > 0 && (
             <>
-              <h4 style={{ marginTop: 12 }}>Game settings</h4>
+              <h4 style={{ marginTop:12 }}>Game settings</h4>
               <ul>
                 {Object.entries(data.extras).map(([k,v]) => (
                   <li key={k}><strong>{k}:</strong> {String(v)}</li>
@@ -183,7 +188,7 @@ export default function ServerDetail() {
 
       {tab === 'console' && (
         <section className="server-card">
-          <h3 style={{ marginTop: 0 }}>RCON Console</h3>
+          <h3 style={{ marginTop:0 }}>RCON Console</h3>
           <form onSubmit={sendRcon} style={{ display:'flex', gap:8, marginBottom:12 }}>
             <input
               className="login-input"
@@ -193,7 +198,10 @@ export default function ServerDetail() {
             />
             <button className="btn small" type="submit">Send</button>
           </form>
-          <div style={{ background:'var(--bg-soft)', border:'1px solid var(--border)', borderRadius:12, padding:12, maxHeight:320, overflow:'auto' }}>
+          <div style={{
+            background:'var(--bg-soft)', border:'1px solid var(--border)', borderRadius:12,
+            padding:12, maxHeight:320, overflow:'auto'
+          }}>
             {consoleLines.length === 0 ? (
               <div className="muted">No console output yet.</div>
             ) : consoleLines.map((l, i) => (
@@ -208,12 +216,18 @@ export default function ServerDetail() {
 
       {tab === 'logs' && (
         <section className="server-card">
-          <h3 style={{ marginTop: 0 }}>Logs</h3>
-          <label style={{ display:'inline-flex', alignItems:'center', gap:6, marginBottom:8 }}>
-            <input type="checkbox" checked={follow} onChange={e => setFollow(e.target.checked)} />
-            Follow
-          </label>
-          <div style={{ background:'var(--bg-soft)', border:'1px solid var(--border)', borderRadius:12, padding:12, maxHeight:420, overflow:'auto' }}>
+          <h3 style={{ marginTop:0 }}>Logs</h3>
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:8 }}>
+            <label style={{ display:'inline-flex', alignItems:'center', gap:6 }}>
+              <input type="checkbox" checked={follow} onChange={e => setFollow(e.target.checked)} />
+              Follow
+            </label>
+            <button className="btn small" onClick={() => { setLogs([]); setCursor(0) }}>Clear</button>
+          </div>
+          <div style={{
+            background:'var(--bg-soft)', border:'1px solid var(--border)', borderRadius:12,
+            padding:12, maxHeight:420, overflow:'auto'
+          }}>
             {logs.length === 0 ? (
               <div className="muted">Waiting for log lines…</div>
             ) : logs.map((line, i) => <div key={i} style={{ whiteSpace:'pre' }}>{line}</div>)}
@@ -224,7 +238,7 @@ export default function ServerDetail() {
 
       {tab === 'settings' && (
         <section className="server-card">
-          <h3 style={{ marginTop: 0 }}>Settings</h3>
+          <h3 style={{ marginTop:0 }}>Settings</h3>
           <p>Editing coming later (name, ports, paths, extras, access control).</p>
         </section>
       )}

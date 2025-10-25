@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GAMES, GAME_DEFAULTS, GAME_EXTRAS } from '@/constants/games.js'
-
+import { http } from '@/services/http.js'
 
 /** Base fields required for ANY server */
 const BASE_FIELDS = [
@@ -20,7 +20,6 @@ export default function CreateServer() {
     // initialize with first game’s defaults (if present)
     const defaultGame = GAMES[0]?.key ?? 'minecraft'
     const d = GAME_DEFAULTS[defaultGame] || {}
-     console.log('CreateServer mounted') 
 
     const [form, setForm] = useState({
         name: '',
@@ -32,13 +31,12 @@ export default function CreateServer() {
         queryPort: d.queryPort ?? '',
     })
     const [touched, setTouched] = useState({})
+    const [submitting, setSubmitting] = useState(false)
+    const [submitError, setSubmitError] = useState('')
 
-    // extras for current grame come from constants
-    //const extras = GAME_CONFIG.extras[form.game] || []
-    //const schema = useMemo(() => [...BASE_FIELDS, ...extras], [form.game, extras])
-
+    // extras for current game come from constants
     const extras = GAME_EXTRAS[form.game] || []
-    const schema = [...BASE_FIELDS, ...extras]
+    const schema = useMemo(() => [...BASE_FIELDS, ...extras], [form.game, extras.length])
 
     // when game changes, prefill sensible defaults for ports (without clobbering typed values)
     function handleGameChange(nextGame) {
@@ -52,12 +50,8 @@ export default function CreateServer() {
         }))
     }
 
-    function setField(name, value) {
-        setForm(prev => ({ ...prev, [name]: value }))
-    }
-    function markTouched(name) {
-        setTouched(prev => ({ ...prev, [name]: true }))
-    }
+    function setField(name, value) { setForm(prev => ({ ...prev, [name]: value })) }
+    function markTouched(name) { setTouched(prev => ({ ...prev, [name]: true })) }
 
     // simple required validation
     const errors = {}
@@ -68,30 +62,52 @@ export default function CreateServer() {
 
     async function handleSubmit(e) {
         e.preventDefault()
+
+        // mark all touched so inline errors show
         const allTouched = {}
         schema.forEach(f => { allTouched[f.name] = true })
         setTouched(allTouched)
+        setSubmitError('')
         if (hasErrors) return
 
+        // flat payload (matches your models/routes nicely)
         const payload = {
             name: form.name,
-            game: form.game,
-            connection: {
-                host: form.host,
-                serverPort: Number(form.serverPort),
-                rcon: { port: Number(form.rconPort), password: form.rconPass },
-                queryPort: form.queryPort ? Number(form.queryPort) : undefined,
-            },
-            extras: (GAME_EXTRAS[form.game] || []).reduce((acc, f) => {
-                acc[f.name] = form[f.name] ?? ''
-                return acc
-            }, {}),
+            game_type: form.game,
+            server_port: Number(form.serverPort),
+
+            // RCON / paths (temporary values for dev; your partner can default/validate server-side)
+            rcon_host: form.host.trim(),
+            rcon_port: Number(form.rconPort),
+            rcon_pass_hash: form.rconPass,
+
+            install_path: "C:\\Games\\Servers\\minecraft\\test123", // dev default
+            server_host_name: form.host.trim(),
+            rcon_user: "admin",                      // dev default
+            java_path: "C:\\Program Files\\Java\\bin\\java.exe",  // dev default
+            steam_cmd_path: "C:\\steamcmd\\steamcmd.exe"          // dev default
         }
 
-        console.log('Create server payload:', payload)
-        nav('/dashboard')
+        try {
+            setSubmitting(true)
+
+            // send only ONE request to your canonical route
+            //    (use '/api/servers' if you added that; otherwise switch this to '/api/servers/new')
+            await http.post('/api/servers', payload)
+
+            nav('/servers')
+        } catch (err) {
+            // show useful details from the backend
+            const msg =
+                (err.body && (err.body.error || err.body.message)) ||
+                err.message || 'Failed to create server'
+            setSubmitError(`${msg}${err.status ? ` (HTTP ${err.status})` : ''}`)
+        } finally {
+            setSubmitting(false)
+        }
     }
-    // payload = formatting for server data going into table
+
+
     return (
         <main className="page">
             <h1>Create Server</h1>
@@ -134,9 +150,15 @@ export default function CreateServer() {
                     )
                 })}
 
+                {submitError && (
+                    <div className="login-error" style={{ marginBottom: 12 }}>{submitError}</div>
+                )}
+
                 <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                    <button type="submit">Create server</button>
-                    <button type="button" onClick={() => nav(-1)}>Cancel</button>
+                    <button type="submit" disabled={submitting}>
+                        {submitting ? 'Creating…' : 'Create server'}
+                    </button>
+                    <button type="button" onClick={() => nav(-1)} disabled={submitting}>Cancel</button>
                 </div>
 
                 <details style={{ marginTop: 16 }}>
