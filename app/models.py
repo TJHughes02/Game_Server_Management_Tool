@@ -59,9 +59,12 @@ class GameServer(db.Model):
 
     def to_dict(self):
         return {
+            "id": self.id,
             "name": self.name,
-            "game_type": self.game_type,
+            "game": self.game_type,
             "status": self.status,
+            "players": 0,
+            "uptimeSec": 0
         }
 
 class RconConfig(db.Model):

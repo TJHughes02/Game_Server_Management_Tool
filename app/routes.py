@@ -76,21 +76,19 @@ def logout():
     return jsonify({"Communion Ended": True}), 200
 
 
-@bp.route("/api/dashboard", methods=["GET", "PATCH", "POST"])
-def dashboard():
+@bp.route("/api/servers", methods=["GET"])
+def get_servers():
     if "uid" not in session:
         print("Unauthorized Access attempted. Machine Spirit denies communion.")
         return jsonify({"Status": "Unauthorized Access"}), 401
 
     print("The sacred cogs turn. All servers hum in obedience, ready for manipulation by the anointed.")
     servers = GameServer.query.all()
-    return jsonify({
-        "ok": True,
-        "Servers": [s.to_dict() for s in servers]
-    }), 200
-# need to get the right route
+    return jsonify([s.to_dict() for s in servers]), 200
+
 @bp.route("/api/servers/new", methods=["POST"])
 def new_server():
+    print("Begun awakening new server....")
     data = request.get_json()
     try:
         newest_server = utils.create_new_server(data)
