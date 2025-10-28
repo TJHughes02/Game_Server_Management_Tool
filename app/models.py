@@ -88,7 +88,7 @@ class ServerInfo(db.Model):
     id                  = db.Column(db.Integer, db.ForeignKey("game_server.id"), primary_key = True)
     start_at            = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     stopped_at          = db.Column(db.DateTime, nullable=True)
-    notes               = db.Column(db.Text, nullable=True)
+    notes               = db.Column(db.Text, nullable=True, default="No notes at this time.")
 
     server = db.relationship("GameServer", back_populates="server_info")
 

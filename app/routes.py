@@ -86,20 +86,27 @@ def get_servers():
     servers = GameServer.query.all()
     return jsonify([s.to_dict() for s in servers]), 200
 
-@bp.route("/api/servers/new", methods=["POST"])
+@bp.route("/api/servers", methods=["POST"])
 def new_server():
     print("Begun awakening new server....")
     data = request.get_json()
     try:
+        print("Server begins to coalesce!")
         newest_server = utils.create_new_server(data)
+        print("Configurations begin to settle!")
         newest_server.rcon_config = utils.create_new_server_rcon_config(data)
+        print("Datavaults begin to fill with knowledge undimmed!")
         newest_server.server_info = utils.create_new_server_info(data)
+        print("The Machine Spirit now deems this servers sanctity...")
         db.session.add(newest_server)
         db.session.commit()
-        print("The sacred cogs whirl. A new server awakens, brought forth by the anointed Tech-Priest.")
-        return jsonify({"Server Awakened": True, "Server": new_server.to_dict()}), 200
+        print("The sacred cogs whirl. A new server awakens, brought forth by the anointed Tech-Priest and sanctified by "
+              "the Machine Spirit.")
+        return jsonify(newest_server.to_dict()), 200
 
     except Exception as e:
         db.session.rollback()
+        import traceback
+        traceback.print_exc()
         print("Heretical error: New server dissipates back into the ether!")
         return jsonify({"Error": "Server Creation Failed"}), 500
