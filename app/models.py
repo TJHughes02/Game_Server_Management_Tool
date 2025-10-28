@@ -43,6 +43,7 @@ class GameServer(db.Model):
     game_type           = db.Column(db.String(120), nullable=False)
     status              = db.Column(db.Enum("Online", "Offline", "Updating", "Starting", "Stopping",
                                             name="server_status"), nullable=False, default="Offline")
+    max_players         = db.Column(db.Integer, default=1)
     server_port         = db.Column(db.Integer, nullable=False)
     install_path        = db.Column(db.String(255), nullable=False)
     archive_path        = db.Column(db.String(255), nullable=True)
@@ -58,12 +59,13 @@ class GameServer(db.Model):
         return f"<GameServer {self.id}; {self.name}>"
 
     def to_dict(self):
+        #current_players = get_current_players(self) #placeholder
         return {
             "id": self.id,
             "name": self.name,
             "game": self.game_type,
             "status": self.status,
-            "players": 0,
+            "players": f'0/{self.max_players}',
             "uptimeSec": 0
         }
 
