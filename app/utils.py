@@ -8,7 +8,7 @@ def create_new_server(data):
         name                = data.get("name"),
         game_type           = data.get("game_type"),
         status              = data.get("status", "Offline"),
-        max_players         = data.get("max_players", 1),
+        max_players         = data.get("Max players", 1),
         server_port         = data.get("server_port"),
         install_path        = data.get("install_path"),
         archive_path        = data.get("archive_path", None),

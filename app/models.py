@@ -45,6 +45,7 @@ class GameServer(db.Model):
                                             name="server_status"), nullable=False, default="Offline")
     max_players         = db.Column(db.Integer, default=1)
     server_port         = db.Column(db.Integer, nullable=False)
+    query_port          = db.Column(db.Integer, nullable=True)
     install_path        = db.Column(db.String(255), nullable=False)
     archive_path        = db.Column(db.String(255), nullable=True)
     backup_path         = db.Column(db.String(255), nullable=True)

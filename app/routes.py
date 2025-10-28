@@ -110,3 +110,39 @@ def new_server():
         traceback.print_exc()
         print("Heretical error: New server dissipates back into the ether!")
         return jsonify({"Error": "Server Creation Failed"}), 500
+
+@bp.route("/api/servers/<int:server_id>", methods=["GET"])
+def display_server(server_id):
+    print(f'Beginning Hymn of Access to Server {server_id}...')
+    if "uid" not in session:
+        print("Unauthorized Access attempted. Machine Spirit denies communion.")
+        return jsonify({"Status": "Unauthorized Access"}), 401
+    print(f'Hymn of Access complete, communion with server {server_id} begun...')
+    server = GameServer.query.get(server_id)
+    display = {"id": server.id, "name": server.name, "game": server.game_type, "status": (server.status or "").lower(),
+               "connection": {
+                   "host": server.rcon_config.rcon_host,
+                   "serverPort": server.server_port,
+                   "rcon": {"port": server.rcon_config.rcon_port},
+               }}
+    return jsonify(display), 200
+
+@bp.route("/api/servers/<int:server_id>/<string:action>", methods=["POST"])
+def server_action(server_id, action):
+    if action == "start":
+        print(f'The sacred levers shift. Steam and ley currents align. Server {server_id} stirs from slumber, blessed by the Omnissiah.')
+        return jsonify({"Status": "Started"}), 200
+    elif action == "stop":
+        print(f'The cogwork slows. The Sparks fade as the essence of Server {server_id} recedes. The Machine Spirit hums farewell.')
+        return jsonify({"Status": "Stopped"}), 200
+    elif action == "restart":
+        print(f'The Tech-Priest chants the rites of renewal. The essence of Server {server_id} is remade anew by sacred circuits.')
+        return jsonify({"Status": "Restarted"}), 200
+    else:
+        print("Unrecognized action requested, seek a Magos for assistance.")
+        return jsonify({"Status": "Unrecognized action requested"}), 500
+
+@bp.route("/api/servers/<int:server_id>", methods=["DELETE"])
+def delete_server(server_id):
+    print(f'Machine Spirit enraged and focusing its ire on server {server_id}...')
+    db.session.query(GameServer).filter_by(id=server_id).delete()
