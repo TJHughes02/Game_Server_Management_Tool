@@ -38,7 +38,7 @@ export default function CreateServer() {
     const extras = GAME_EXTRAS[form.game] || []
     const schema = useMemo(() => [...BASE_FIELDS, ...extras], [form.game, extras.length])
 
-    // when game changes, prefill sensible defaults for ports (without clobbering typed values)
+    // when game changes, prefill sensible defaults for ports
     function handleGameChange(nextGame) {
         const nd = GAME_DEFAULTS[nextGame] || {}
         setForm(prev => ({
@@ -70,13 +70,13 @@ export default function CreateServer() {
         setSubmitError('')
         if (hasErrors) return
 
-        // flat payload (matches your models/routes nicely)
+        // flat payload (matches models)
         const payload = {
             name: form.name,
             game_type: form.game,
             server_port: Number(form.serverPort),
 
-            // RCON / paths (temporary values for dev; your partner can default/validate server-side)
+            // RCON / paths 
             rcon_host: form.host.trim(),
             rcon_port: Number(form.rconPort),
             rcon_pass_hash: form.rconPass,
