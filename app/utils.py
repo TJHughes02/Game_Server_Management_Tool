@@ -2,8 +2,6 @@
 from app.models import GameServer, RconConfig, ServerInfo
 from datetime import datetime, timezone
 
-from app.routes import delete_server
-
 
 def create_new_server(data):
     new_server = GameServer(
@@ -37,3 +35,21 @@ def create_new_server_info(data):
         notes       = data.get("notes", "No notes at this time."),
     )
     return new_info
+
+def start_server(server_id):
+    server = GameServer.query.get(server_id)
+    server.status = "Starting"
+    # code to start the game server
+    server.status = "Online"
+
+def stop_server(server_id):
+    server = GameServer.query.get(server_id)
+    server.status = "Stopping"
+    # code to stop the server
+    server.status = "Stopped"
+
+def restart_server(server_id):
+    server = GameServer.query.get(server_id)
+    stop_server(server_id)
+    server.status = "Updating"
+    start_server(server_id)
