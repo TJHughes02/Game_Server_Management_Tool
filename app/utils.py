@@ -51,5 +51,8 @@ def stop_server(server_id):
 def restart_server(server_id):
     server = GameServer.query.get(server_id)
     stop_server(server_id)
-    server.status = "Updating"
     start_server(server_id)
+
+def update_server(server_id):
+    server = GameServer.query.get(server_id)
+    # code for updating the server

@@ -130,15 +130,15 @@ def display_server(server_id):
 @bp.route("/api/servers/<int:server_id>/<string:action>", methods=["POST"])
 def server_action(server_id, action):
     if action == "start":
-        start_server(server_id)
+        utils.start_server(server_id)
         print(f'The sacred levers shift. Steam and ley currents align. Server {server_id} stirs from slumber, blessed by the Omnissiah.')
         return jsonify({"Status": "Started"}), 200
     elif action == "stop":
-        stop_server(server_id)
+        utils.stop_server(server_id)
         print(f'The cogwork slows. The Sparks fade as the essence of Server {server_id} recedes. The Machine Spirit hums farewell.')
         return jsonify({"Status": "Stopped"}), 200
     elif action == "restart":
-        restart_server(server_id)
+        utils.restart_server(server_id)
         print(f'The Tech-Priest chants the rites of renewal. The essence of Server {server_id} is remade anew by sacred circuits.')
         return jsonify({"Status": "Restarted"}), 200
     else:
