@@ -145,4 +145,13 @@ def server_action(server_id, action):
 @bp.route("/api/servers/<int:server_id>", methods=["DELETE"])
 def delete_server(server_id):
     print(f'Machine Spirit enraged and focusing its ire on server {server_id}...')
-    db.session.query(GameServer).filter_by(id=server_id).delete()
+    try:
+        db.session.query(GameServer).filter_by(id=server_id).delete()
+        db.session.commit()
+        print(f'The Machine Spirits ire ebbs... Server {server_id} has been purged.')
+        return jsonify({f'Server Deletion Successful.'}), 200
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        print(f"Heretical error: {server_id} persists...")
+        return jsonify({"Error": "Server Deletion Failed"}), 500
