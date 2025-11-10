@@ -4,12 +4,47 @@ from datetime import datetime, timezone
 
 
 DEFAULT_COMMANDS = {
-    "Minecraft (Java Edition)": {},
-    "ARK: Survival Evolved":{},
-    "Rust":{},
-    "Counter-Strike: Global Offensive": {},
-    "Factorio": {}
-    # more games to be added later?
+    "Minecraft (Java Edition)": {
+        "broadcast":    "/say {message}",
+        "list_players": "/list",
+        "kick":         "/kick {player}",
+        "ban":          "/ban {player}",
+        "unban":        "/pardon {player}",
+        "save":         "/save-all"
+    },
+    "ARK: Survival Evolved": {
+        "broadcast":    "ServerChat {message}",
+        "list_players": "ListPlayers",
+        "kick":         "KickPlayer {steamid}",
+        "ban":          "BanPlayer {steamid}",
+        "unban":        "UnbanPlayer {steamid}",
+        "save":         "SaveWorld"
+    },
+    "Rust":{
+        "broadcast":    "say {message}",
+        "list_players": "playerlist",
+        "kick":         "kick {player}",
+        "ban":          "ban {player}",
+        "unban":        "unban {player}",
+        "save":         "server.save"
+    },
+    "Counter-Strike: Global Offensive": {
+        "broadcast":    "say {message}",
+        "list_players": "status",
+        "kick":         "kick {player}",
+        "ban":          "banid {steamid}",
+        "unban":        "removeid {steamid}",
+        "save":         "host_writeconfig"
+    },
+    "Factorio": {
+        "broadcast":    "/c game.print(\"{message}\")",
+        "list_players": "/c for _, player in pairs(game.connected_players) do game.print(player.name) end",
+        "kick":         "/c game.players[\"{player}\"].ban(\"You have been kicked\")",
+        "ban":          "/c game.players[\"{player}\"].ban(\"Banned\")",
+        "unban":        "/c game.players[\"{player}\"].unban()",
+        "save":         "/c game.server_save()"
+    },
+    # more games/commands to be added later?
 }
 
 def create_new_server(data):
@@ -49,19 +84,23 @@ def start_server(server_id):
     server = GameServer.query.get(server_id)
     server.status = "Starting"
     # code to start the game server
+    # verify server started, then set status
     server.status = "Online"
 
 def stop_server(server_id):
     server = GameServer.query.get(server_id)
     server.status = "Stopping"
     # code to stop the server
+    # verify server stopped and resources freed, then set status
     server.status = "Stopped"
 
 def restart_server(server_id):
     server = GameServer.query.get(server_id)
+    server.status = "Restarting"
     stop_server(server_id)
     start_server(server_id)
 
 def update_server(server_id):
     server = GameServer.query.get(server_id)
+    server.status = "Updating"
     # code for updating the server
