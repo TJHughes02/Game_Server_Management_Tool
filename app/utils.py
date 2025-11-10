@@ -3,6 +3,15 @@ from app.models import GameServer, RconConfig, ServerInfo
 from datetime import datetime, timezone
 
 
+DEFAULT_COMMANDS = {
+    "Minecraft (Java Edition)": {},
+    "ARK: Survival Evolved":{},
+    "Rust":{},
+    "Counter-Strike: Global Offensive": {},
+    "Factorio": {}
+    # more games to be added later?
+}
+
 def create_new_server(data):
     new_server = GameServer(
         name                = data.get("name"),
