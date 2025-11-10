@@ -156,5 +156,6 @@ def delete_server(server_id):
     except Exception as e:
         db.session.rollback()
         import traceback
-        print(f"Heretical error: {server_id} persists...")
+        print(f"Heretical error: Server {server_id} persists...")
+        traceback.print_exc()
         return jsonify({"Error": "Server Deletion Failed"}), 500
