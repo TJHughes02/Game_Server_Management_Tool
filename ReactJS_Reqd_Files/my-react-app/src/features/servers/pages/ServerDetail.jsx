@@ -140,7 +140,7 @@ export default function ServerDetail() {
           <ServerActions
             server={data}
             onChange={load}
-            onDeleted={() => nav('/servers')}
+             onDeleted={() => nav("/dashboard")} /* NOT NAV TO SERVERS (depricated) */
           />
         </div>
       </div>

@@ -4,17 +4,21 @@
 
 import { useState } from "react";
 import { startServer, stopServer, restartServer, deleteServer } from "@/features/api.js";
+import { useNavigate } from "react-router-dom";
 
 export default function ServerActions({ server, onChange, onDeleted }) {
+  const nav = useNavigate();
   const [busy, setBusy] = useState(false);
 
-  async function run(fn, confirmText) {
+  async function handleDelete() {
     if (busy) return;
-    if (confirmText && !window.confirm(confirmText)) return;
+    if (!window.confirm(`Delete “${server.name}”? This cannot be undone.`)) return;
     setBusy(true);
     try {
-      await fn();
+      await deleteServer(server.id);
       onChange?.();
+      // go to dash after delete
+      onDeleted ? onDeleted() : nav("/dashboard");
     } finally {
       setBusy(false);
     }
@@ -51,7 +55,7 @@ export default function ServerActions({ server, onChange, onDeleted }) {
 
       <button
         className="btn small danger"
-        onClick={() => run(
+        onClick={() => handleDelete(
           async () => { await deleteServer(server.id); onDeleted?.() },
           `Delete “${server.name}”? This cannot be undone.`
         )}
