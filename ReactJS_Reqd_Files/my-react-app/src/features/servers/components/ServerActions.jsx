@@ -10,22 +10,35 @@ export default function ServerActions({ server, onChange, onDeleted }) {
   const nav = useNavigate();
   const [busy, setBusy] = useState(false);
 
+  // helper for button refresh
+  async function run(fn, confirmText) {
+    if (busy) return;
+    if (confirmText && !window.confirm(confirmText)) return;
+    setBusy(true);
+    try {
+      await fn();
+      onChange?.();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+
   async function handleDelete() {
     if (busy) return;
     if (!window.confirm(`Delete “${server.name}”? This cannot be undone.`)) return;
     setBusy(true);
     try {
       await deleteServer(server.id);
-      onChange?.();
-      // go to dash after delete
-      onDeleted ? onDeleted() : nav("/dashboard");
+      onChange?.();                           
+      (onDeleted ? onDeleted() : nav("/dashboard"));
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="actions-row" style={{ display:"flex", gap:8 }}>
+    <div className="actions-row" style={{ display: "flex", gap: 8 }}>
       <button
         className="btn small"
         onClick={() => run(() => startServer(server.id))}
@@ -55,10 +68,7 @@ export default function ServerActions({ server, onChange, onDeleted }) {
 
       <button
         className="btn small danger"
-        onClick={() => handleDelete(
-          async () => { await deleteServer(server.id); onDeleted?.() },
-          `Delete “${server.name}”? This cannot be undone.`
-        )}
+        onClick={handleDelete}
         disabled={busy}
         title="Delete server"
       >
