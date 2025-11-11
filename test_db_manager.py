@@ -60,8 +60,6 @@ def create_servers():
         )
 
         test_server1.server_info = ServerInfo(
-            start_at=datetime.now(timezone.utc),
-            stopped_at=datetime.now(timezone.utc),
             notes="Initial Setup for Minecraft",
         )
 
@@ -87,8 +85,6 @@ def create_servers():
         )
 
         test_server2.server_info = ServerInfo(
-            start_at=datetime.now(timezone.utc),
-            stopped_at=datetime.now(timezone.utc),
             notes="Initial Setup for Ark"
         )
 

@@ -89,6 +89,7 @@ def start_server(server_id):
     # code to start the game server
     time.sleep(5) #simulate transition
     # verify server started, then set status
+    server.start_at = datetime.now(timezone.utc)
     server.status = "Online"
     db.session.commit()
 
@@ -99,6 +100,7 @@ def stop_server(server_id):
     # code to stop the server
     time.sleep(5) #simulate transition
     # verify server stopped and resources freed, then set status
+    server.stopped_at = datetime.now(timezone.utc)
     server.status = "Offline"
     db.session.commit()
 

@@ -87,7 +87,7 @@ class RconConfig(db.Model):
 class ServerInfo(db.Model):
     __tablename__       = "server_info"
     id                  = db.Column(db.Integer, db.ForeignKey("game_server.id"), primary_key = True)
-    start_at            = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    start_at            = db.Column(db.DateTime, nullable=True)
     stopped_at          = db.Column(db.DateTime, nullable=True)
     notes               = db.Column(db.Text, nullable=True, default="No notes at this time.")
 
