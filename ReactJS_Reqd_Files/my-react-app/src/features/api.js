@@ -5,5 +5,5 @@ import { http } from "@/services/http.js";
 
 export const startServer   = (id) => http.post(`/api/servers/${id}/start`, {});
 export const stopServer    = (id) => http.post(`/api/servers/${id}/stop`,  {});
-export const restartServer = (id) => http.post(`/api/servers/${id}/restart`, {}); // ← add this
+export const restartServer = (id) => http.post(`/api/servers/${id}/restart`, {});
 export const deleteServer  = (id) => http.del(`/api/servers/${id}`);
