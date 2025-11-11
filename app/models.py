@@ -60,14 +60,18 @@ class GameServer(db.Model):
         return f"<GameServer {self.id}; {self.name}>"
 
     def to_dict(self):
-        #current_players = get_current_players(self) #placeholder
+        uptime = 0
+        if self.status == "Online" and self.server_info.started_at:
+            uptime = (datetime.now() - self.server_info.started_at).total_seconds()
+        elif self.status == "Offline" and self.server_info.started_at and self.server_info.stopped_at:
+            uptime = (self.server_info.stopped_at - self.server_info.started_at).total_seconds()
         return {
             "id": self.id,
             "name": self.name,
             "game": self.game_type,
             "status": self.status,
             "players": f'0/{self.max_players}',
-            "uptimeSec": 0
+            "uptimeSec": int(uptime)
         }
 
 class RconConfig(db.Model):
@@ -87,7 +91,7 @@ class RconConfig(db.Model):
 class ServerInfo(db.Model):
     __tablename__       = "server_info"
     id                  = db.Column(db.Integer, db.ForeignKey("game_server.id"), primary_key = True)
-    start_at            = db.Column(db.DateTime, nullable=True)
+    started_at            = db.Column(db.DateTime, nullable=True)
     stopped_at          = db.Column(db.DateTime, nullable=True)
     notes               = db.Column(db.Text, nullable=True, default="No notes at this time.")
 

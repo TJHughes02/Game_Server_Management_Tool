@@ -76,8 +76,6 @@ def create_new_server_rcon_config(data):
 
 def create_new_server_info(data):
     new_info = ServerInfo(
-        start_at    = data.get("start_at", datetime.now(timezone.utc)),
-        stopped_at  = data.get("stopped_at"),
         notes       = data.get("notes", "No notes at this time."),
     )
     return new_info
@@ -89,7 +87,7 @@ def start_server(server_id):
     # code to start the game server
     time.sleep(5) #simulate transition
     # verify server started, then set status
-    server.start_at = datetime.now(timezone.utc)
+    server.server_info.started_at = datetime.now(timezone.utc)
     server.status = "Online"
     db.session.commit()
 
@@ -100,7 +98,7 @@ def stop_server(server_id):
     # code to stop the server
     time.sleep(5) #simulate transition
     # verify server stopped and resources freed, then set status
-    server.stopped_at = datetime.now(timezone.utc)
+    server.server_info.stopped_at = datetime.now(timezone.utc)
     server.status = "Offline"
     db.session.commit()
 
