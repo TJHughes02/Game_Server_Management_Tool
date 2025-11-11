@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, session
 from . import db, utils
 from .models import User, GameServer
+from .utils import DEFAULT_COMMANDS
 
 bp = Blueprint("routes", __name__)
 
@@ -159,3 +160,15 @@ def delete_server(server_id):
         print(f"Heretical error: Server {server_id} persists...")
         traceback.print_exc()
         return jsonify({"Error": "Server Deletion Failed"}), 500
+
+@bp.route("/api/servers/<int:server_id>/rcon", methods=["POST"])
+def rcon_command(server_id):
+    data = request.get_json()
+    if "default_command" in data:
+        # default command stuff
+        return jsonify({"Status": "default command"}), 400
+    elif "custom_command" in data:
+        # custom command stuff
+        return jsonify({"Status": "Custom command"}), 400
+    else:
+        return jsonify({"Status": "Unrecognized command"}), 500
