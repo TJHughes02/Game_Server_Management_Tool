@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { http } from '@/services/http.js'
 import { GAMES } from '@/constants/games.js'
+import { deleteServer } from "@/api.js";
 
 function formatDuration(sec) {
   if (!sec || sec <= 0) return '—'
@@ -107,6 +108,12 @@ export default function ServerDetail() {
       setConsoleLines(prev => [...prev, { ts: new Date().toLocaleTimeString(), kind: 'out', text: `ERROR: ${e.message}` }])
     }
   }
+
+  async function handleDelete() {
+  if (!confirm(`Delete “${server.name}”? This can’t be undone.`)) return;
+  await deleteServer(server.id);
+  nav("/servers");   // go back to list
+}
 
   if (loading) return <main className="page"><p>Loading…</p></main>
   if (error)   return <main className="page"><p className="login-error">{error}</p></main>

@@ -9,3 +9,6 @@ export const startServer = (id) =>
 
 export const stopServer = (id) =>
   http.post(`/api/servers/${id}/stop`, {});
+
+export const deleteServer = (id) =>
+  http.del(`/api/servers/${id}`);
