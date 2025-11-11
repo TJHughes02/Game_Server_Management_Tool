@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import ServerActions from '@/features/servers/components/ServerActions.jsx'
 import { http } from '@/services/http.js'
 import { GAMES } from '@/constants/games.js'
 import { deleteServer } from "@/api.js";
@@ -14,6 +15,7 @@ function formatDuration(sec) {
 
 export default function ServerDetail() {
   const { id } = useParams()
+  const nav = useNavigate()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -110,14 +112,14 @@ export default function ServerDetail() {
   }
 
   async function handleDelete() {
-  if (!confirm(`Delete “${server.name}”? This can’t be undone.`)) return;
-  await deleteServer(server.id);
-  nav("/servers");   // go back to list
-}
+    if (!confirm(`Delete “${server.name}”? This can’t be undone.`)) return;
+    await deleteServer(server.id);
+    nav("/servers");   // go back to list
+  }
 
   if (loading) return <main className="page"><p>Loading…</p></main>
-  if (error)   return <main className="page"><p className="login-error">{error}</p></main>
-  if (!data)   return <main className="page"><p>Not found.</p></main>
+  if (error) return <main className="page"><p className="login-error">{error}</p></main>
+  if (!data) return <main className="page"><p>Not found.</p></main>
 
   const gameLabel = gameLabelByKey[data.game] || data.game
   const playersText = (data.players != null && data.maxPlayers != null)
@@ -129,23 +131,23 @@ export default function ServerDetail() {
       <div className="dash-header" style={{ marginBottom: 12 }}>
         <div>
           <h1 className="dash-greeting" style={{ marginBottom: 4 }}>{data.name}</h1>
-          <div style={{ display:'flex', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <span><strong>Game:</strong> {gameLabel}</span>
             <span className={`status-pill ${data.status}`}>{data.status}</span>
             <span><strong>Players:</strong> {playersText}</span>
             <span><strong>Uptime:</strong> {formatDuration(data.uptimeSec)}</span>
           </div>
-        </div>
-        <div style={{ display:'flex', gap:8 }}>
-          <button className="btn small" onClick={() => doAction('start')}   disabled={busy || data.status === 'online'}>Start</button>
-          <button className="btn small" onClick={() => doAction('stop')}    disabled={busy || data.status === 'offline'}>Stop</button>
-          <button className="btn small" onClick={() => doAction('restart')} disabled={busy}>Restart</button>
+          <ServerActions
+            server={data}
+            onChange={load}
+            onDeleted={() => nav('/servers')}
+          />
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display:'flex', gap:8, marginBottom:12 }}>
-        {['overview','console','logs','settings'].map(t => (
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        {['overview', 'console', 'logs', 'settings'].map(t => (
           <button
             key={t}
             className={`btn small ${tab === t ? 'link active' : ''}`}
@@ -154,7 +156,7 @@ export default function ServerDetail() {
             {t[0].toUpperCase() + t.slice(1)}
           </button>
         ))}
-        <div style={{ marginLeft:'auto' }}>
+        <div style={{ marginLeft: 'auto' }}>
           <Link to="/servers" className="link">← Back to servers</Link>
         </div>
       </div>
@@ -162,8 +164,8 @@ export default function ServerDetail() {
       {/* Panels */}
       {tab === 'overview' && (
         <section className="server-card">
-          <h3 style={{ marginTop:0 }}>Overview</h3>
-          <div style={{ display:'grid', gap:6, gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))' }}>
+          <h3 style={{ marginTop: 0 }}>Overview</h3>
+          <div style={{ display: 'grid', gap: 6, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
             <div><span className="meta-label">Host</span>{data.connection?.host ?? '—'}</div>
             <div><span className="meta-label">Server port</span>{data.connection?.serverPort ?? '—'}</div>
             <div><span className="meta-label">RCON port</span>{data.connection?.rcon?.port ?? '—'}</div>
@@ -173,7 +175,7 @@ export default function ServerDetail() {
           {data.paths && (
             <>
               <h4>Paths</h4>
-              <div style={{ display:'grid', gap:6 }}>
+              <div style={{ display: 'grid', gap: 6 }}>
                 <div><span className="meta-label">Root</span>{data.paths.root ?? '—'}</div>
                 <div><span className="meta-label">Log</span>{data.paths.log ?? '—'}</div>
               </div>
@@ -182,9 +184,9 @@ export default function ServerDetail() {
 
           {data.extras && Object.keys(data.extras).length > 0 && (
             <>
-              <h4 style={{ marginTop:12 }}>Game settings</h4>
+              <h4 style={{ marginTop: 12 }}>Game settings</h4>
               <ul>
-                {Object.entries(data.extras).map(([k,v]) => (
+                {Object.entries(data.extras).map(([k, v]) => (
                   <li key={k}><strong>{k}:</strong> {String(v)}</li>
                 ))}
               </ul>
@@ -195,8 +197,8 @@ export default function ServerDetail() {
 
       {tab === 'console' && (
         <section className="server-card">
-          <h3 style={{ marginTop:0 }}>RCON Console</h3>
-          <form onSubmit={sendRcon} style={{ display:'flex', gap:8, marginBottom:12 }}>
+          <h3 style={{ marginTop: 0 }}>RCON Console</h3>
+          <form onSubmit={sendRcon} style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
             <input
               className="login-input"
               placeholder="Type a command (e.g., say Hello)"
@@ -206,14 +208,14 @@ export default function ServerDetail() {
             <button className="btn small" type="submit">Send</button>
           </form>
           <div style={{
-            background:'var(--bg-soft)', border:'1px solid var(--border)', borderRadius:12,
-            padding:12, maxHeight:320, overflow:'auto'
+            background: 'var(--bg-soft)', border: '1px solid var(--border)', borderRadius: 12,
+            padding: 12, maxHeight: 320, overflow: 'auto'
           }}>
             {consoleLines.length === 0 ? (
               <div className="muted">No console output yet.</div>
             ) : consoleLines.map((l, i) => (
-              <div key={i} style={{ whiteSpace:'pre-wrap', color: l.kind === 'in' ? '#9cc2ff' : 'inherit' }}>
-                <span className="muted" style={{ marginRight:6 }}>[{l.ts}]</span>
+              <div key={i} style={{ whiteSpace: 'pre-wrap', color: l.kind === 'in' ? '#9cc2ff' : 'inherit' }}>
+                <span className="muted" style={{ marginRight: 6 }}>[{l.ts}]</span>
                 {l.kind === 'in' ? `> ${l.text}` : l.text}
               </div>
             ))}
@@ -223,21 +225,21 @@ export default function ServerDetail() {
 
       {tab === 'logs' && (
         <section className="server-card">
-          <h3 style={{ marginTop:0 }}>Logs</h3>
-          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:8 }}>
-            <label style={{ display:'inline-flex', alignItems:'center', gap:6 }}>
+          <h3 style={{ marginTop: 0 }}>Logs</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <input type="checkbox" checked={follow} onChange={e => setFollow(e.target.checked)} />
               Follow
             </label>
             <button className="btn small" onClick={() => { setLogs([]); setCursor(0) }}>Clear</button>
           </div>
           <div style={{
-            background:'var(--bg-soft)', border:'1px solid var(--border)', borderRadius:12,
-            padding:12, maxHeight:420, overflow:'auto'
+            background: 'var(--bg-soft)', border: '1px solid var(--border)', borderRadius: 12,
+            padding: 12, maxHeight: 420, overflow: 'auto'
           }}>
             {logs.length === 0 ? (
               <div className="muted">Waiting for log lines…</div>
-            ) : logs.map((line, i) => <div key={i} style={{ whiteSpace:'pre' }}>{line}</div>)}
+            ) : logs.map((line, i) => <div key={i} style={{ whiteSpace: 'pre' }}>{line}</div>)}
             <div ref={logEndRef} />
           </div>
         </section>
@@ -245,7 +247,7 @@ export default function ServerDetail() {
 
       {tab === 'settings' && (
         <section className="server-card">
-          <h3 style={{ marginTop:0 }}>Settings</h3>
+          <h3 style={{ marginTop: 0 }}>Settings</h3>
           <p>Editing coming later (name, ports, paths, extras, access control).</p>
         </section>
       )}

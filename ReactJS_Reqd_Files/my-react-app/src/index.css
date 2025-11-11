@@ -232,3 +232,11 @@ body{ margin:0; background:var(--bg); color:var(--text); }
   .dash{ grid-template-columns: 1fr; }
   .dash-sidebar{ min-height: auto; }
 }
+
+/* warning for delete */
+.btn.danger{
+  border:1px solid #5b2a31;
+  color:#ffb4c8;
+  background:transparent;
+}
+.btn.danger:hover{ background:#3b1f26; }
