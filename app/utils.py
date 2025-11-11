@@ -1,6 +1,8 @@
 #file for utility functions
 from app.models import GameServer, RconConfig, ServerInfo
+from app import db
 from datetime import datetime, timezone
+import time
 
 
 DEFAULT_COMMANDS = {
@@ -83,24 +85,31 @@ def create_new_server_info(data):
 def start_server(server_id):
     server = GameServer.query.get(server_id)
     server.status = "Starting"
+    db.session.commit()
     # code to start the game server
+    time.sleep(5) #simulate transition
     # verify server started, then set status
     server.status = "Online"
+    db.session.commit()
 
 def stop_server(server_id):
     server = GameServer.query.get(server_id)
     server.status = "Stopping"
+    db.session.commit()
     # code to stop the server
+    time.sleep(5) #simulate transition
     # verify server stopped and resources freed, then set status
-    server.status = "Stopped"
+    server.status = "Offline"
+    db.session.commit()
 
 def restart_server(server_id):
-    server = GameServer.query.get(server_id)
-    server.status = "Restarting"
     stop_server(server_id)
+    time.sleep(5) #simulate transition
     start_server(server_id)
+    db.session.commit()
 
 def update_server(server_id):
     server = GameServer.query.get(server_id)
     server.status = "Updating"
     # code for updating the server
+    db.session.commit()

@@ -122,8 +122,8 @@ def display_server(server_id):
     server = GameServer.query.get(server_id)
     display = {"id": server.id, "name": server.name, "game": server.game_type, "status": (server.status or "").lower(),
                "connection": {
-                   "host": server.rcon_config.rcon_host,
-                   "serverPort": server.server_port,
+                   "host":          server.rcon_config.rcon_host,
+                   "serverPort":    server.server_port,
                    "rcon": {"port": server.rcon_config.rcon_port},
                }}
     return jsonify(display), 200
@@ -136,11 +136,11 @@ def server_action(server_id, action):
         return jsonify({"Status": "Started"}), 200
     elif action == "stop":
         utils.stop_server(server_id)
-        print(f'The cogwork slows. The Sparks fade as the essence of Server {server_id} recedes. The Machine Spirit hums farewell.')
+        print(f'The cogwork slows. The spark fades as the essence of Server {server_id} recedes. The Machine Spirit hums farewell.')
         return jsonify({"Status": "Stopped"}), 200
     elif action == "restart":
         utils.restart_server(server_id)
-        print(f'The Tech-Priest chants the rites of renewal. The essence of Server {server_id} is remade anew by sacred circuits.')
+        print(f'The Tech-Priest chants the rites of renewal. The essence of Server {server_id} is made anew by sacred circuits.')
         return jsonify({"Status": "Restarted"}), 200
     else:
         print("Unrecognized action requested, seek a Magos for assistance.")
@@ -163,9 +163,10 @@ def delete_server(server_id):
 
 @bp.route("/api/servers/<int:server_id>/rcon", methods=["POST"])
 def rcon_command(server_id):
+    server = GameServer.query.get(server_id)
+    rcon = server.rcon_config
     data = request.get_json()
     if "default_command" in data:
-        # default command stuff
         return jsonify({"Status": "default command"}), 400
     elif "custom_command" in data:
         # custom command stuff
