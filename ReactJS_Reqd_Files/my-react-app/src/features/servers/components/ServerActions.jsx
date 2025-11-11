@@ -3,7 +3,7 @@
 // DO NOT PLACE BUTTONS IN CREATE
 
 import { useState } from "react";
-import { startServer, stopServer, restartServer, deleteServer } from "@/api.js";
+import { startServer, stopServer, restartServer, deleteServer } from "@/features/api.js";
 
 export default function ServerActions({ server, onChange, onDeleted }) {
   const [busy, setBusy] = useState(false);

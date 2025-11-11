@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import ServerActions from '@/features/servers/components/ServerActions.jsx'
 import { http } from '@/services/http.js'
 import { GAMES } from '@/constants/games.js'
-import { deleteServer } from "@/api.js";
+import { deleteServer } from "@/features/api.js";
 
 function formatDuration(sec) {
   if (!sec || sec <= 0) return '—'
