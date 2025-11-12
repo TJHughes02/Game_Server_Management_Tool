@@ -4,24 +4,32 @@ import { http } from '@/services/http'
 const AuthCtx = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null);
+  const [booting, setBooting] = useState(true);
+  
 
   useEffect(() => {
-    fetch('/api/me', { credentials: 'include' })
-      .then(r => r.ok ? r.json() : { authenticated: false })
-      .then(d => { if (d.authenticated && d.user) setUser(d.user) })
-      .finally(() => setLoading(false))
-      // added 10.20.25
-      ; (async () => {
-        try {
-          const d = await http.get('/api/me')
-          if (d?.authenticated && d.user) setUser(d.user)
-        } finally {
-          setLoading(false)
+  const cached = localStorage.getItem("authUser");
+  if (cached) setUser(JSON.parse(cached));
+
+  (async () => {
+    try {
+      const r = await fetch("/api/session", { credentials: "include" });
+      if (r.ok) {
+        const data = await r.json();
+        if (data?.user) {
+          setUser(data.user);
+          localStorage.setItem("authUser", JSON.stringify(data.user));
+        } else {
+          setUser(null);
+          localStorage.removeItem("authUser");
         }
-      })()
-  }, [])
+      }
+    } finally {
+      setBooting(false);
+    }
+  })();
+}, []);
 
   async function logout() {
     try {
@@ -52,3 +60,5 @@ export function useAuth() {
 // ADDED HTTP CALLS FROM SERVICES HTTPAPI. THIS IS THE NEW WAY OF HANDLING
 // API CALLS IN THE FRONT-END FOR SERVERS AND LOGIN RELATED THINGS
 // FINISHED 10.20.25
+// WORKING ON SESSIONS FIX, ADDING REQUIRED CODE AND CONFIG FIXES
+// FINISHED 11.12.25
