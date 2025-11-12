@@ -71,6 +71,8 @@ class GameServer(db.Model):
             "game": self.game_type,
             "status": self.status,
             "players": f'0/{self.max_players}',
+            "started_at": self.server_info.started_at,
+            "stopped_at": self.server_info.stopped_at,
             "uptimeSec": int(uptime)
         }
 
