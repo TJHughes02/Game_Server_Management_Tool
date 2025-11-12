@@ -1,47 +1,57 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { http } from '@/services/http'
+import { http } from '@/services/http.js'
 
 const AuthCtx = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [booting, setBooting] = useState(true);
-  
+
 
   useEffect(() => {
-  const cached = localStorage.getItem("authUser");
-  if (cached) setUser(JSON.parse(cached));
+    const cached = localStorage.getItem('authUser')
+    if (cached) setUser(JSON.parse(cached))
 
-  (async () => {
-    try {
-      const r = await fetch("/api/session", { credentials: "include" });
-      if (r.ok) {
-        const data = await r.json();
-        if (data?.user) {
-          setUser(data.user);
-          localStorage.setItem("authUser", JSON.stringify(data.user));
-        } else {
-          setUser(null);
-          localStorage.removeItem("authUser");
+      // session change
+      ; (async () => {
+        try {
+          const r = await fetch('/api/session', { credentials: 'include' })
+          if (r.ok) {
+            const data = await r.json()
+            if (data?.user) {
+              setUser(data.user)
+              localStorage.setItem('authUser', JSON.stringify(data.user))
+            } else {
+              setUser(null)
+              localStorage.removeItem('authUser')
+            }
+          }
+        } finally {
+          setBooting(false)
         }
-      }
-    } finally {
-      setBooting(false);
-    }
-  })();
-}, []);
+      })()
+  }, [])
+
+  // currently not needed, may be needed for functionality later
+  // async function login(display_name, password) {
+  //   const data = await http.post('/api/login', { display_name, password })
+  //   setUser(data.user)
+  //   localStorage.setItem('authUser', JSON.stringify(data.user))
+  //   return data.user
+  // }
 
   async function logout() {
     try {
-      await fetch('/api/logout', { method: 'POST', credentials: 'include' })
       await http.post('/api/logout', {})
     } finally {
       setUser(null)
+      localStorage.removeItem('authUser')
     }
   }
 
+
   return (
-    <AuthCtx.Provider value={{ user, setUser, loading, logout }}>
+    <AuthCtx.Provider value={{ user, setUser, booting, logout }}>
       {children}
     </AuthCtx.Provider>
   )
