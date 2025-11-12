@@ -19,9 +19,9 @@ import ServerDetail from './features/servers/pages/ServerDetail.jsx'
 //}
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth()
-  if (loading) return <main className="page"><p>Loading…</p></main>
-  return user ? children : <Navigate to="/login" replace />
+  const { user, booting } = useAuth();
+  if (booting) return null;
+  return user ? children : <Navigate to="/login" replace />;
 }
 
 
