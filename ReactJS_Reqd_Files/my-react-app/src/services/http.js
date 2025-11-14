@@ -1,14 +1,6 @@
 const USE_MOCK = import.meta.env.VITE_USE_MOCK_API === 'true' // false in PROD
 const API_BASE = import.meta.env.VITE_API_BASE || '' //'' when using Vite proxy
 
-let _mockReq
-async function mockRequest(method, url, opts) {
-  if (!_mockReq) {
-    _mockReq = (await import('../mocks/handlers.js')).mockRequest
-  }
-  return _mockReq(method, url, opts)
-}
-
 function buildUrl(url, params) {
   if (!params) return url
   const qs = new URLSearchParams(params).toString()
