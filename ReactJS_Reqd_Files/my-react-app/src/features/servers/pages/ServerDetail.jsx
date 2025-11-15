@@ -157,7 +157,7 @@ export default function ServerDetail() {
           </button>
         ))}
         <div style={{ marginLeft: 'auto' }}>
-          <Link to="/servers" className="link">← Back to servers</Link>
+          <Link to="/dashboard" className="link">← Back to dashboard</Link> {/* navs to dashboard */}
         </div>
       </div>
 
