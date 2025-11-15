@@ -95,7 +95,7 @@ export default function CreateServer() {
             //    (use '/api/servers' if you added that; otherwise switch this to '/api/servers/new')
             await http.post('/api/servers', payload)
 
-            nav('/servers')
+            nav('/dashboard')
         } catch (err) {
             // show useful details from the backend
             const msg =
