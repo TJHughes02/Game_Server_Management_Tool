@@ -81,7 +81,7 @@ export default function CreateServer() {
             rcon_port: Number(form.rconPort),
             rcon_pass_hash: form.rconPass,
 
-            install_path: "C:\\Games\\Servers\\minecraft\\test123", // dev default
+            install_path: "", // fully in backend
             server_host_name: form.host.trim(),
             rcon_user: "admin",                      // dev default
             java_path: "C:\\Program Files\\Java\\bin\\java.exe",  // dev default
