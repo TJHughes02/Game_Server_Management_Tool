@@ -17,6 +17,8 @@ const BASE_FIELDS = [
 export default function CreateServer() {
     const nav = useNavigate()
 
+    // will need to fix because all games defaults to minecraft.
+
     // initialize with first game’s defaults (if present)
     const defaultGame = GAMES[0]?.key ?? 'minecraft'
     const d = GAME_DEFAULTS[defaultGame] || {}
@@ -70,7 +72,7 @@ export default function CreateServer() {
         setSubmitError('')
         if (hasErrors) return
 
-        // flat payload (matches models)
+        // flat payload (changed will be needed)
         const payload = {
             name: form.name,
             game_type: form.game,
@@ -84,7 +86,9 @@ export default function CreateServer() {
             install_path: "", // fully in backend
             server_host_name: form.host.trim(),
             rcon_user: "admin",                      // dev default
-            java_path: "",
+            // JAVA PATH IS CURRENTLY HARD CODED, THE BACKEND WILL IDENTIFY
+            // BUT IT DOES NOT WORK CORRECTLY LIKE IT SHOULD
+            java_path: "C:\\Program Files\\Microsoft\\jdk-11.0.16.101-hotspot\\bin\\java.exe",
             steam_cmd_path: "C:\\steamcmd\\steamcmd.exe"          // dev default
         }
 
