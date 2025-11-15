@@ -98,12 +98,17 @@ def new_server():
         newest_server.rcon_config = utils.create_new_server_rcon_config(data)
         print("Datavaults begin to fill with knowledge undimmed!")
         newest_server.server_info = utils.create_new_server_info(data)
+
         print("The Machine Spirit now deems this servers sanctity...")
         db.session.add(newest_server)
+
+        db.session.flush()
+        utils.provision_server_files(newest_server)
+
         db.session.commit()
         print("The sacred cogs whirl. A new server awakens, brought forth by the anointed Tech-Priest and sanctified by "
               "the Machine Spirit.")
-        return jsonify(newest_server.to_dict()), 200
+        return jsonify(newest_server.to_dict()), 201
 
     except Exception as e:
         db.session.rollback()
@@ -174,3 +179,11 @@ def rcon_command(server_id):
         return jsonify({"Status": "Custom command"}), 400
     else:
         return jsonify({"Status": "Unrecognized command"}), 500
+
+@bp.get("/api/session")
+def session_me():
+    uid = session.get("uid")
+    if not uid:
+        return jsonify({"ok": True, "user": None}), 200
+    u = User.query.get(uid)
+    return jsonify({"ok": True, "user": {"id": u.id, "display_name": u.display_name}}), 200

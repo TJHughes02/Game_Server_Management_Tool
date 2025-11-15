@@ -87,6 +87,9 @@ class RconConfig(db.Model):
     java_path           = db.Column(db.String(255), nullable=False)
     steam_cmd_path      = db.Column(db.String(255), nullable=False)
 
+    # java args for minecraft, example: "-Xms2G -Xmx4G"
+    java_args = db.Column(db.String(255), nullable=True, default="")
+
     server = db.relationship("GameServer", back_populates="rcon_config")
 
 #Server Info table
