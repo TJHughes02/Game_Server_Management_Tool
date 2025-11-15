@@ -84,7 +84,7 @@ export default function CreateServer() {
             install_path: "", // fully in backend
             server_host_name: form.host.trim(),
             rcon_user: "admin",                      // dev default
-            java_path: "C:\\Program Files\\Java\\bin\\java.exe",  // dev default
+            java_path: "",
             steam_cmd_path: "C:\\steamcmd\\steamcmd.exe"          // dev default
         }
 
