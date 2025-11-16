@@ -16,7 +16,7 @@ def create_app():
 
     # Make sure the core folders exist when the app starts (will create if not in utils)
     from .utils import ensure_base_dirs
-    utils.ensure_base_dirs()
+    ensure_base_dirs()
 
     # CORS for Vite (dev ONLY)
     CORS(app, origins=["http://localhost:5173"], supports_credentials=True)

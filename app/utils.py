@@ -254,9 +254,9 @@ def start_minecraft_process(server_id: int) -> subprocess.Popen:
     print(f"[process] Starting server {server_id} with command: {' '.join(cmd)}", flush=True)
 
     # On Windows, suppress opening a new console window (CLI doesn't appear)
-    creationflags = 0
-    if platform.system() == "Windows":
-        creationflags = 0x08000000  # CREATE_NO_WINDOW
+    # creationflags = 0
+    # if platform.system() == "Windows":
+    #     creationflags = 0x08000000  # CREATE_NO_WINDOW
 
     proc = subprocess.Popen(
         cmd,
@@ -264,7 +264,7 @@ def start_minecraft_process(server_id: int) -> subprocess.Popen:
         stdin=subprocess.PIPE,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT,
-        creationflags=creationflags
+        #creationflags=creationflags # uncomment later for window to not show up
     )
 
     RUNNING_PROCESSES[server_id] = proc
@@ -429,7 +429,7 @@ def start_server(server_id):
         # Mark the server as Error
         server = GameServer.query.get(server_id)
         if server:
-            server.status = "Error"
+            server.status = "Offline" # in enum
             db.session.add(server)
             db.session.commit()
 
