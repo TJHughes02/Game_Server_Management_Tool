@@ -88,7 +88,7 @@ export default function CreateServer() {
             rcon_user: "admin",                      // dev default
             // JAVA PATH IS CURRENTLY HARD CODED, THE BACKEND WILL IDENTIFY
             // BUT IT DOES NOT WORK CORRECTLY LIKE IT SHOULD
-            java_path: "C:\\Program Files\\Microsoft\\jdk-11.0.16.101-hotspot\\bin\\java.exe",
+            java_path: "C:\\Users\\tmhug\\Downloads\\jdk-21.0.9\\bin\\java.exe",
             steam_cmd_path: "C:\\steamcmd\\steamcmd.exe"          // dev default
         }
 
