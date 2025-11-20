@@ -44,10 +44,6 @@ export default function App() {
             element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
           />
           <Route
-            path="/servers"
-            element={<ProtectedRoute><ServersList /></ProtectedRoute>}
-          />
-          <Route
             path="/servers/new"
             element={<ProtectedRoute><CreateServer /></ProtectedRoute>}
           />

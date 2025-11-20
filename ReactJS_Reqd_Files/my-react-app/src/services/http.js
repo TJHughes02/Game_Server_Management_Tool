@@ -42,7 +42,7 @@ async function realRequest(method, url, { params, body, headers, signal } = {}) 
 }
 
 async function request(method, url, opts) {
-  if (USE_MOCK) return mockRequest(method, url, opts)
+  //if (USE_MOCK) return mockRequest(method, url, opts)
   return realRequest(method, url, opts)
 }
 
