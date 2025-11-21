@@ -1,0 +1,19 @@
+Todo list currently for the project (now and future)
+
+Current (before the capstone fair)
+
+About page (simple documentation)
+Fix default ports in create page
+    - each game should have default
+    - maybe check if port is in database already somehow?
+Add color to status indicators in dashboard
+Have delete delete the server files (NOT THE BACKUPS)
+create the backups tab/page (if we get to this)
+
+LOGGING CONSOLE AND EXECUTING RCON COMMANDS
+
+SECOND GAME!!!
+
+
+Future (Post capstone fair)
+several project refinement properties
