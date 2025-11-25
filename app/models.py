@@ -99,6 +99,7 @@ class ServerInfo(db.Model):
     started_at            = db.Column(db.DateTime, nullable=True)
     stopped_at          = db.Column(db.DateTime, nullable=True)
     notes               = db.Column(db.Text, nullable=True, default="No notes at this time.")
+    logs                = db.Column(db.Text, nullable=True, default="")
 
     server = db.relationship("GameServer", back_populates="server_info")
 

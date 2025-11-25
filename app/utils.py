@@ -529,3 +529,24 @@ def build_minecraft_install_path(name: str, server_id: int) -> str:
     folder_name = f"{safe_name}_{server_id}"
     full_path = MINECRAFT_SERVERS_ROOT / folder_name
     return str(full_path)
+
+
+
+def append_log(server_info, user, action, result, message=None):
+    timestamp = datetime.now(timezone.utc).strftime("%m/%d/%Y %H:%M:%S")
+
+    entry_parts = [
+        f"[{timestamp} UTC]",
+        f"ServerId={server_info.id}",
+        f"ServerName=\"{server_info.server_name}\"",
+        f"User=\"{user}\"",
+        f"Action=\"{action}\"",
+        f"Result={result}"
+    ]
+    if message:
+        message = message.replace("\n", " ").strip()
+        entry_parts.append(f"Message=\"{message}\"")
+
+    entry = " | ".join(entry_parts) + "\n"
+
+    server_info.logs = (server_info.logs or "") + entry
