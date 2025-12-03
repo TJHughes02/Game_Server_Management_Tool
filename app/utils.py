@@ -12,8 +12,8 @@ import subprocess
 import platform
 
 # Leave empty to use PATH Var.
-DEFAULT_JAVA_PATH = r"C:\Program Files\Microsoft\jdk-11.0.16.101-hotspot\bin\java.exe"
-
+#DEFAULT_JAVA_PATH = r"C:\Program Files\Microsoft\jdk-11.0.16.101-hotspot\bin\java.exe"
+DEFAULT_JAVA_PATH = r"C:\Program Files\Java\jdk-21\bin\java.exe"
 # Root folder for all Minecraft servers
 MINECRAFT_SERVERS_ROOT = Path(r"C:\GameServers\Minecraft")
 
@@ -73,6 +73,7 @@ DEFAULT_COMMANDS = {
     },
     # more games/commands to be added later?
 }
+
 
 #
 #
@@ -262,13 +263,26 @@ def start_minecraft_process(server_id: int) -> subprocess.Popen:
         cmd,
         cwd=server.install_path,
         stdin=subprocess.PIPE,
-        stdout=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1
         #creationflags=creationflags # uncomment later for window to not show up
     )
 
     RUNNING_PROCESSES[server_id] = proc
+
     print(f"[process] Server {server_id} started (pid={proc.pid})", flush=True)
+
+    def read_stdout():
+        for line in proc.stdout:
+            print(f"[server {server_id}] {line}", end="")
+
+    import threading
+    t = threading.Thread(target=read_stdout, daemon=True)
+    t.start()
+
+
     return proc
 
 
@@ -296,7 +310,7 @@ def stop_minecraft_process(server_id: int, timeout: float = 30.0) -> bool:
     # Try to send 'stop' to stdin
     try:
         if proc.stdin:
-            proc.stdin.write(b"stop\n")
+            proc.stdin.write("stop\n")
             proc.stdin.flush()
             print(f"[process] Sent 'stop' to server {server_id}", flush=True)
     except Exception as e:
@@ -437,7 +451,7 @@ def start_server(server_id):
 def stop_server(server_id):
     """
     High-level stop server handler used by the API.
-    Tries to stop gracefully and updates status/stopped_at.
+    Tries to stop and updates status/stopped_at.
     """
     server = GameServer.query.get(server_id)
     if not server:
@@ -529,24 +543,3 @@ def build_minecraft_install_path(name: str, server_id: int) -> str:
     folder_name = f"{safe_name}_{server_id}"
     full_path = MINECRAFT_SERVERS_ROOT / folder_name
     return str(full_path)
-
-
-
-def append_log(server_info, user, action, result, message=None):
-    timestamp = datetime.now(timezone.utc).strftime("%m/%d/%Y %H:%M:%S")
-
-    entry_parts = [
-        f"[{timestamp} UTC]",
-        f"ServerId={server_info.id}",
-        f"ServerName=\"{server_info.server_name}\"",
-        f"User=\"{user}\"",
-        f"Action=\"{action}\"",
-        f"Result={result}"
-    ]
-    if message:
-        message = message.replace("\n", " ").strip()
-        entry_parts.append(f"Message=\"{message}\"")
-
-    entry = " | ".join(entry_parts) + "\n"
-
-    server_info.logs = (server_info.logs or "") + entry
