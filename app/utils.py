@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import platform
 
+from typing import List
+
 # Leave empty to use PATH Var.
 #DEFAULT_JAVA_PATH = r"C:\Program Files\Microsoft\jdk-11.0.16.101-hotspot\bin\java.exe"
 DEFAULT_JAVA_PATH = r"C:\Program Files\Java\jdk-21\bin\java.exe"
@@ -543,3 +545,45 @@ def build_minecraft_install_path(name: str, server_id: int) -> str:
     folder_name = f"{safe_name}_{server_id}"
     full_path = MINECRAFT_SERVERS_ROOT / folder_name
     return str(full_path)
+
+
+#
+#
+#
+#
+#
+
+"""
+GET LOGS HELPERS FOR MINECRAFT SERVERS ONLY FOR GETTING THE LATEST.LOG TEXTS FILES
+"""
+
+def get_latest_log_path_for_server(server: GameServer) -> Path:
+    """
+    Return the expected path to latest.log for "this" server.
+    "this" pertains to the ID at which the server is at
+    """
+    if not server.install_path:
+        raise ValueError(f"Server {server.id} has no install_path set")
+
+    base = Path(server.install_path)
+    logs_dir = base / "logs"
+    return logs_dir / "latest.log"
+
+# ----------
+
+def read_latest_log_lines(server: GameServer, max_lines: int = 200) -> List[str]:
+    """
+    Read up to `max_lines` from the end of latest.log for a server.
+    Returns a list of lines without trailing newlines.
+    """
+    log_path = get_latest_log_path_for_server(server)
+
+    if not log_path.exists():
+        raise FileNotFoundError(f"Log file not found at {log_path}")
+
+    # read the whole file, then tail it
+    with log_path.open("r", encoding="utf-8", errors="replace") as f:
+        lines = f.readlines()
+
+    # strip trailing newlines and only keep the tail
+    return [line.rstrip("\r\n") for line in lines[-max_lines:]]

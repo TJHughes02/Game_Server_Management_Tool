@@ -187,3 +187,59 @@ def session_me():
         return jsonify({"ok": True, "user": None}), 200
     u = User.query.get(uid)
     return jsonify({"ok": True, "user": {"id": u.id, "display_name": u.display_name}}), 200
+
+"""
+LOGS ROUTEs
+"""
+
+@bp.route("/api/servers/<int:server_id>/logs", methods=["GET"])
+def server_logs(server_id):
+    """
+    Return the tail of the Minecraft latest.log for this server.
+
+    Response shape:
+    {
+      "server_id": 1,
+      "lines": [...],
+      "message": "optional info / error text"
+    }
+    """
+    if "uid" not in session:
+        return jsonify({"Status": "Unauthorized Access"}), 401
+
+    server = GameServer.query.get(server_id)
+    if not server:
+        return jsonify({"Error": "Server not found"}), 404
+
+    game = (server.game_type or "").lower()
+    if "minecraft" not in game:
+        return jsonify({"Error": "Logs only supported for Minecraft servers right now."}), 400
+
+    # Optional ?lines=300 query parameter
+    try:
+        max_lines = request.args.get("lines", default=200, type=int)
+    except Exception:
+        max_lines = 200
+
+    try:
+        lines = utils.read_latest_log_lines(server, max_lines=max_lines)
+        return jsonify({
+            "server_id": server.id,
+            "lines": lines,
+            "message": ""
+        }), 200
+
+    except FileNotFoundError:
+        return jsonify({
+            "server_id": server.id,
+            "lines": [],
+            "message": "Log file not found yet (has the server started and written any logs?)."
+        }), 200
+
+    except OSError as e:
+        # Some OS-level issue while reading
+        return jsonify({
+            "server_id": server.id,
+            "lines": [],
+            "message": f"Could not read log file: {e}"
+        }), 500
