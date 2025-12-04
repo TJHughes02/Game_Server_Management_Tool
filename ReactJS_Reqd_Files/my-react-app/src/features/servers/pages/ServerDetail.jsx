@@ -28,7 +28,7 @@ export default function ServerDetail() {
 
   // Logs polling
   const [logs, setLogs] = useState([])
-  const [cursor, setCursor] = useState(0)
+  //const [cursor, setCursor] = useState(0)
   const [follow, setFollow] = useState(true)
   const logEndRef = useRef(null)
 
@@ -54,20 +54,36 @@ export default function ServerDetail() {
 
   // Logs: poll every 2s only while on the Logs tab
   useEffect(() => {
-    if (tab !== 'logs') return
-    let cancelled = false
+    if (tab !== 'logs') return;
+    let cancelled = false;
+
     const tick = async () => {
       try {
-        const res = await http.get(`/api/servers/${id}/logs`, { params: { cursor } })
+        // ask backend for the latest N lines (or let backend default)
+        const res = await http.get(`/api/servers/${id}/logs`, {
+          params: { lines: 200 }, // overrides backend?
+        });
+
         if (!cancelled && res && Array.isArray(res.lines)) {
-          setCursor(res.cursor ?? cursor)
-          setLogs(prev => [...prev, ...res.lines])
+          // REPLACE LINES, NOT APPENDS
+          setLogs(res.lines);
         }
-      } catch { /* ignore for now */ }
-    }
-    const i = setInterval(tick, 2000)
-    return () => { cancelled = true; clearInterval(i) }
-  }, [id, tab, cursor])
+      } catch {
+        // gets here if error state, should not be needed currently.
+      }
+    };
+
+    // initial fetch
+    tick();
+    // start polling
+    const i = setInterval(tick, 2000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(i);
+    };
+  }, [id, tab]);
+
 
   // Auto-scroll logs when following
   useEffect(() => {
@@ -140,7 +156,7 @@ export default function ServerDetail() {
           <ServerActions
             server={data}
             onChange={load}
-             onDeleted={() => nav("/dashboard")} /* NOT NAV TO SERVERS (depricated) */
+            onDeleted={() => nav("/dashboard")} /* NOT NAV TO SERVERS (depricated) */
           />
         </div>
       </div>
@@ -231,7 +247,7 @@ export default function ServerDetail() {
               <input type="checkbox" checked={follow} onChange={e => setFollow(e.target.checked)} />
               Follow
             </label>
-            <button className="btn small" onClick={() => { setLogs([]); setCursor(0) }}>Clear</button>
+            <button className="btn small" onClick={() => setLogs([])}>Clear</button>
           </div>
           <div style={{
             background: 'var(--bg-soft)', border: '1px solid var(--border)', borderRadius: 12,
