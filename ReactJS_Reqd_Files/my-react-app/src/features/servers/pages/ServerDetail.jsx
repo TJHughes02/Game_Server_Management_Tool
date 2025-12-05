@@ -122,7 +122,7 @@ export default function ServerDetail() {
       const res = await http.post(`/api/servers/${id}/rcon`, { command: text })
       let out = ""
       if (res.success) {
-        out = String(res.output ?? "")
+        out = String(res.output ?? " ")
       }
       else{
         out = out = `ERROR: ${res.error ?? "Unknown error"}`
