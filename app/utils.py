@@ -125,9 +125,14 @@ def provision_minecraft_server(server: GameServer):
     if not props_path.exists():
         port = server.server_port or 25565 # default
         max_players = server.max_players or 20 # default (player count is broken again)
+        rcon_port = server.rcon_config.rcon_port or 25575
+        rcon_password = server.rcon_config.rcon_pass_hash or ""
         lines = [
             f"server-port={port}",
+            f"enable-rcon=true",
             f"max-players={max_players}",
+            f"rcon.port={rcon_port}",
+            f"rcon.password={rcon_password}"
         ]
         props_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
