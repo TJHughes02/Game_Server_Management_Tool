@@ -4,3 +4,4 @@ __pycache__/
 .env
 # Ignore Python virtual environment
 venv/
+app.db
