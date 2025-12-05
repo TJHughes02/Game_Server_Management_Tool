@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { http } from '@/services/http.js'
 import { GAMES } from '@/constants/games.js'
-import { useUptime } from '../../hooks/useUptime.js'
+//import { useUptime } from '../../hooks/useUptime.js'
 
 
 export default function ServersList() {
