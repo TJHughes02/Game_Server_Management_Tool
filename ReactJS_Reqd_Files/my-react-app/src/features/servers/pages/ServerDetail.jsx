@@ -38,17 +38,30 @@ export default function ServerDetail() {
   )
 
   async function load() {
-    try {
-      setLoading(true)
-      const res = await http.get(`/api/servers/${id}`)
-      setData(res)
-      setError('')
-    } catch (e) {
-      setError(e.message || 'Failed to load server')
-    } finally {
-      setLoading(false)
-    }
+  try {
+    setLoading(true);
+
+    // fetch detail
+    const detail = await http.get(`/api/servers/${id}`);
+
+    // fetch the list and find this server's basic info
+    const list = await http.get('/api/servers');
+    const listEntry = Array.isArray(list)
+      ? list.find(s => String(s.id) === String(id))
+      : null;
+
+    // merge them: listEntry has players/maxPlayers, detail has connection/paths/extras
+    const merged = listEntry ? { ...detail, ...listEntry } : detail;
+
+    setData(merged);
+    setError('');
+  } catch (e) {
+    setError(e.message || 'Failed to load server');
+  } finally {
+    setLoading(false);
   }
+}
+
 
   useEffect(() => { load() }, [id])
 
@@ -83,6 +96,24 @@ export default function ServerDetail() {
       clearInterval(i);
     };
   }, [id, tab]);
+
+  // uptime
+  useEffect(() => {
+    if (!data?.started_at) return;
+
+    const interval = setInterval(() => {
+      setData(prev => {
+        if (!prev?.started_at) return prev;
+        const diffSec = Math.floor(
+          (Date.now() - new Date(prev.started_at).getTime()) / 1000
+        );
+        return { ...prev, uptimeSec: diffSec };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [data?.started_at]);
+
 
 
   // Auto-scroll logs when following
@@ -124,7 +155,7 @@ export default function ServerDetail() {
       if (res.success) {
         out = String(res.output ?? " ")
       }
-      else{
+      else {
         out = out = `ERROR: ${res.error ?? "Unknown error"}`
       }
       setConsoleLines(prev => [...prev, { ts: new Date().toLocaleTimeString(), kind: 'out', text: out }])
@@ -145,8 +176,18 @@ export default function ServerDetail() {
   if (!data) return <main className="page"><p>Not found.</p></main>
 
   const gameLabel = gameLabelByKey[data.game] || data.game
-  const playersText = (data.players != null && data.maxPlayers != null)
-    ? `${data.players}/${data.maxPlayers}` : (data.players ?? '—')
+  // derive maxPlayers from api
+  const maxPlayers =
+    data?.maxPlayers ??
+    data?.extras?.maxPlayers ??
+    null;
+
+  // derive players text the same way as dashboard (will need to change later)
+  const playersText =
+    data?.players != null && maxPlayers != null
+      ? `${data.players}/${maxPlayers}`
+      : (data?.players ?? "—");
+
 
   return (
     <main className="page">
