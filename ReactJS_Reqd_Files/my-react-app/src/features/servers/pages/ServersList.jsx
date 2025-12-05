@@ -3,14 +3,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { http } from '@/services/http.js'
 import { GAMES } from '@/constants/games.js'
+import { useUptime } from '../../hooks/useUptime.js'
 
-function formatDuration(sec) {
-  if (!sec || sec <= 0) return '—'
-  const h = Math.floor(sec / 3600)
-  const m = Math.floor((sec % 3600) / 60)
-  const s = sec % 60
-  return [h ? `${h}h` : null, m ? `${m}m` : null, s ? `${s}s` : null].filter(Boolean).join(' ')
-}
 
 export default function ServersList() {
   const [items, setItems] = useState([])
@@ -53,6 +47,7 @@ export default function ServersList() {
       ) : (
         <div className="servers-grid">
           {items.map(s => {
+            const upTimeSec = s.started_at ? useUptime(s.started_at) : 0
             const gameLabel = gameLabelByKey[s.game] || s.game
             const playersText =
               s.players != null && s.maxPlayers != null ? `${s.players}/${s.maxPlayers}` :
@@ -68,7 +63,7 @@ export default function ServersList() {
                 <div className="server-meta">
                   <div><span className="meta-label">Game</span>{gameLabel}</div>
                   <div><span className="meta-label">Players</span>{playersText}</div>
-                  <div><span className="meta-label">Uptime</span>{formatDuration(s.uptimeSec)}</div>
+                  <div><span className="meta-label">Uptime</span>{formatDuration(upTimeSec)}</div>
                 </div>
 
                 <div className="server-actions">

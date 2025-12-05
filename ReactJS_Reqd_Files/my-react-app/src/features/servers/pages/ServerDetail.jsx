@@ -120,17 +120,24 @@ export default function ServerDetail() {
 
     try {
       const res = await http.post(`/api/servers/${id}/rcon`, { command: text })
-      const out = typeof res?.output === 'string' ? res.output : JSON.stringify(res)
+      let out = ""
+      if (res.success) {
+        out = String(res.output ?? "")
+      }
+      else{
+        out = out = `ERROR: ${res.error ?? "Unknown error"}`
+      }
       setConsoleLines(prev => [...prev, { ts: new Date().toLocaleTimeString(), kind: 'out', text: out }])
     } catch (e) {
-      setConsoleLines(prev => [...prev, { ts: new Date().toLocaleTimeString(), kind: 'out', text: `ERROR: ${e.message}` }])
+      const backendMsg = (e.body && (e.body.error || e.body.message)) || e.message
+      setConsoleLines(prev => [...prev, { ts: new Date().toLocaleTimeString(), kind: 'out', text: `ERROR: ${backendMsg}` }])
     }
   }
 
   async function handleDelete() {
     if (!confirm(`Delete “${server.name}”? This can’t be undone.`)) return;
     await deleteServer(server.id);
-    nav("/servers");   // go back to list
+    nav("/dashboard");   // go back to list
   }
 
   if (loading) return <main className="page"><p>Loading…</p></main>

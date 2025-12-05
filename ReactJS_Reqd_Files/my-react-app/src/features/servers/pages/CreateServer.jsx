@@ -89,7 +89,8 @@ export default function CreateServer() {
             // JAVA PATH IS CURRENTLY HARD CODED, THE BACKEND WILL IDENTIFY
             // BUT IT DOES NOT WORK CORRECTLY LIKE IT SHOULD
             java_path: "C:\\Users\\tmhug\\Downloads\\jdk-21.0.9\\bin\\java.exe",
-            steam_cmd_path: "C:\\steamcmd\\steamcmd.exe"          // dev default
+            steam_cmd_path: "C:\\steamcmd\\steamcmd.exe",          // dev default
+            extras: GAME_EXTRAS[form.game]?.reduce((a, f) => ({ ...a, [f.name]: form[f.name] }), {})
         }
 
         try {

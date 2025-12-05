@@ -4,6 +4,15 @@ import { useAuth } from '@/context/AuthContext.jsx'
 import { http } from '@/services/http.js'
 import { GAMES } from '@/constants/games.js'
 
+function formatDuration(sec,status) {
+  if (status != "Online") return '—'
+  if (!sec || sec <= 0) return '—'
+  const h = Math.floor(sec / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  const s = sec % 60
+  return [h ? `${h}h` : null, m ? `${m}m` : null, s ? `${s}s` : null].filter(Boolean).join(' ')
+}
+
 export default function Dashboard() {
   const { user } = useAuth()
   const nav = useNavigate()
@@ -28,6 +37,18 @@ export default function Dashboard() {
       }
     })()
   }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setServers(prev => prev.map(s => {
+        if (!s.started_at) return s;
+        const diffSec = Math.floor((Date.now() - new Date(s.started_at).getTime()) / 1000);
+        return { ...s, uptimeSec: diffSec };
+      }));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <main className="page">
@@ -69,7 +90,7 @@ export default function Dashboard() {
                   <div className="server-meta">
                     <div><span className="meta-label">Game</span>{gameLabelByKey[s.game] || s.game}</div>
                     <div><span className="meta-label">Players</span>{s.players ?? '—'}</div>
-                    <div><span className="meta-label">Uptime</span>{(s.uptimeSec ?? 0) > 0 ? `${Math.floor(s.uptimeSec/60)}m` : '—'}</div>
+                    <div><span className="meta-label">Uptime</span>{s.uptimeSec ? formatDuration(s.uptimeSec, s.status) : '—'}</div>
                   </div>
                   <div className="server-actions">
                     <Link to={`/servers/${s.id}`} className="btn small">Open</Link>
