@@ -121,7 +121,7 @@ def provision_minecraft_server(server: GameServer):
     # Minimal server.properties, Minecraft generate the rest
     # this should be from the frontend later, here for now until entires can be
     # figured out.
-    props_path = install_path / "server.properties"
+    props_path = install_path / "server.properties" #
     if not props_path.exists():
         port = server.server_port or 25565 # default
         max_players = server.max_players or 20 # default (player count is broken again)
