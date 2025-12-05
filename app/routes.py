@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request, session
 from . import db, utils
 from .models import User, GameServer
 from .utils import DEFAULT_COMMANDS
+from rcon import Client
+from mcrcon import MCRcon
 
 bp = Blueprint("routes", __name__)
 
@@ -126,10 +128,11 @@ def display_server(server_id):
     print(f'Hymn of Access complete, communion with server {server_id} begun...')
     server = GameServer.query.get(server_id)
     display = {"id": server.id, "name": server.name, "game": server.game_type, "status": (server.status or "").lower(),
+               "started_at": server.server_info.started_at, "active_players": server.active_players, "max_players": server.max_players,
                "connection": {
                    "host":          server.rcon_config.rcon_host,
                    "serverPort":    server.server_port,
-                   "rcon": {"port": server.rcon_config.rcon_port},
+                   "rcon": {"port": server.rcon_config.rcon_port}
                }}
     return jsonify(display), 200
 
@@ -169,16 +172,39 @@ def delete_server(server_id):
 
 @bp.route("/api/servers/<int:server_id>/rcon", methods=["POST"])
 def rcon_command(server_id):
-    server = GameServer.query.get(server_id)
-    rcon = server.rcon_config
+    if "uid" not in session:
+        return jsonify({"Error": "Unauthorized"}), 401
+
     data = request.get_json()
-    if "default_command" in data:
-        return jsonify({"Status": "default command"}), 400
-    elif "custom_command" in data:
-        # custom command stuff
-        return jsonify({"Status": "Custom command"}), 400
-    else:
-        return jsonify({"Status": "Unrecognized command"}), 500
+    command = data.get("command")
+
+    if not command:
+        print("COMMAND ISSUE")
+        return jsonify({"Error": "No command provided"}), 500
+
+    server = GameServer.query.get(server_id)
+    if not server:
+        print("SERVER ISSUE")
+        return jsonify({"Error": "Server not found"}), 404
+
+    if server.status != "Online":
+        print("STATUS ISSUE")
+        return jsonify({"Error": "Server not online"}), 500
+
+    try:
+        print("WE GET TO THE TRY")
+        rcon = server.rcon_config
+        with MCRcon("127.0.0.1", rcon.rcon_pass_hash, rcon.rcon_port) as client:
+            print(f"WE GET TO THE CLIENT")
+            output = client.command(command)
+            return jsonify({"success": True,
+                            "output": output
+                            }), 200
+
+    except Exception as e:
+        return jsonify({"success": False,
+                        "error ": str(e)
+                        }), 500
 
 @bp.get("/api/session")
 def session_me():
@@ -222,7 +248,38 @@ def server_logs(server_id):
         max_lines = 200
 
     try:
+        # read current players stored in DB
+        raw_players = server.active_players or ""
+
         lines = utils.read_latest_log_lines(server, max_lines=max_lines)
+
+        for line in lines:
+
+            # -------- PLAYER JOINED --------
+            if "joined the game" in line:
+                players = {p.strip() for p in raw_players.split("\n") if p.strip()}
+                # extract name cleanly
+                name = line[33:].split("joined the game")[0].strip()
+
+                if name not in players:
+                    players.add(name)
+                    server.active_players = "\n".join(sorted(players))
+                    db.session.commit()
+
+            # -------- PLAYER LEFT --------
+            elif "left the game" in line:
+                players = {p.strip() for p in raw_players.split("\n") if p.strip()}
+                print("PLAYER LEFT BRANCH CURRENT PLAYERS: ", players)
+                name = line[33:].split("left the game")[0].strip()
+                print("NAME BEING REMOVED",name)
+
+                if name in players:
+                    print("THIS MOTHERFUCKER left:", name)
+                    players.remove(name)
+                    print("players after being removed: ", players)
+                    server.active_players = "\n".join(sorted(players))
+                    print("SERVER ACTIVE PLAYERS AFTER REMOVAL: ", server.active_players)
+                    db.session.commit()
         return jsonify({
             "server_id": server.id,
             "lines": lines,

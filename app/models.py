@@ -43,6 +43,7 @@ class GameServer(db.Model):
     game_type           = db.Column(db.String(120), nullable=False)
     status              = db.Column(db.Enum("Online", "Offline", "Updating", "Starting", "Stopping",
                                             name="server_status"), nullable=False, default="Offline")
+    active_players      = db.Column(db.Text, nullable=True)
     max_players         = db.Column(db.Integer, default=1)
     server_port         = db.Column(db.Integer, nullable=False)
     query_port          = db.Column(db.Integer, nullable=True)
@@ -59,21 +60,26 @@ class GameServer(db.Model):
     def __repr__(self):
         return f"<GameServer {self.id}; {self.name}>"
 
+    #uptime may be calculated in front end negating need for it in backend
     def to_dict(self):
-        uptime = 0
-        if self.status == "Online" and self.server_info.started_at:
-            uptime = (datetime.now() - self.server_info.started_at).total_seconds()
-        elif self.status == "Offline" and self.server_info.started_at and self.server_info.stopped_at:
-            uptime = (self.server_info.stopped_at - self.server_info.started_at).total_seconds()
+        # read current players stored in DB
+        raw_players = self.active_players or ""
+        players = {p.strip() for p in raw_players.split("\n") if p.strip()}
+        print(players)
+        current_players = 0
+        for player in players:
+            current_players += 1
+        if self.status == "Offline":
+            current_players = 0
         return {
             "id": self.id,
             "name": self.name,
             "game": self.game_type,
             "status": self.status,
-            "players": f'0/{self.max_players}',
+            "players": f"{current_players} / {self.max_players}",
             "started_at": self.server_info.started_at,
-            "stopped_at": self.server_info.stopped_at,
-            "uptimeSec": int(uptime)
+            #"stopped_at": self.server_info.stopped_at,
+            #"uptimeSec": int(uptime)
         }
 
 class RconConfig(db.Model):
@@ -96,7 +102,7 @@ class RconConfig(db.Model):
 class ServerInfo(db.Model):
     __tablename__       = "server_info"
     id                  = db.Column(db.Integer, db.ForeignKey("game_server.id"), primary_key = True)
-    started_at            = db.Column(db.DateTime, nullable=True)
+    started_at          = db.Column(db.DateTime, nullable=True)
     stopped_at          = db.Column(db.DateTime, nullable=True)
     notes               = db.Column(db.Text, nullable=True, default="No notes at this time.")
     logs                = db.Column(db.Text, nullable=True, default="")

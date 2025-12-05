@@ -369,6 +369,7 @@ def kill_minecraft_process(server_id: int) -> bool:
 #
 
 def create_new_server(data):
+    print(data)
     new_server = GameServer(
         name                = data.get("name"),
         game_type           = data.get("game_type"),
@@ -431,6 +432,7 @@ def start_server(server_id):
         # If here without exception, server Online
         if server.server_info is not None:
             server.server_info.started_at = datetime.now(timezone.utc)
+            print(f"SERVER STARTED SUCCESSFULLY AT {server.server_info.started_at}", flush=True)
         server.status = "Online"
         db.session.commit()
         print(f"[start_server] Server {server_id} marked Online", flush=True)
@@ -474,6 +476,7 @@ def stop_server(server_id):
             if server.server_info is not None:
                 server.server_info.stopped_at = datetime.now(timezone.utc)
             server.status = "Offline"
+            server.active_players = ""
             print(f"[stop_server] Server {server_id} stopped and marked Offline", flush=True)
         else:
             # server timed out or failed
