@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import ServerActions from '@/features/servers/components/ServerActions.jsx'
 import { http } from '@/services/http.js'
 import { GAMES } from '@/constants/games.js'
-import { deleteServer } from "@/features/api.js";
+//import { deleteServer } from "@/features/api.js";
 
 function formatDuration(sec) {
   if (!sec || sec <= 0) return '—'
@@ -169,11 +169,11 @@ export default function ServerDetail() {
     }
   }
 
-  async function handleDelete() {
-    if (!confirm(`Delete “${server.name}”? This can’t be undone.`)) return;
-    await deleteServer(server.id);
-    nav("/dashboard");   // go back to list
-  }
+  // async function handleDelete() {
+  //   if (!confirm(`Delete “${server.name}”? This can’t be undone.`)) return;
+  //   await deleteServer(server.id);
+  //   nav("/dashboard");   // go back to list
+  // }
 
   if (loading) return <main className="page"><p>Loading…</p></main>
   if (error) return <main className="page"><p className="login-error">{error}</p></main>
