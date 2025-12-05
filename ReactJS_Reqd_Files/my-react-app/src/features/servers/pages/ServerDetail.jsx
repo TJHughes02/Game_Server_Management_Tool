@@ -38,29 +38,29 @@ export default function ServerDetail() {
   )
 
   async function load() {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // fetch detail
-    const detail = await http.get(`/api/servers/${id}`);
+      // fetch detail
+      const detail = await http.get(`/api/servers/${id}`);
 
-    // fetch the list and find this server's basic info
-    const list = await http.get('/api/servers');
-    const listEntry = Array.isArray(list)
-      ? list.find(s => String(s.id) === String(id))
-      : null;
+      // fetch the list and find this server's basic info
+      const list = await http.get('/api/servers');
+      const listEntry = Array.isArray(list)
+        ? list.find(s => String(s.id) === String(id))
+        : null;
 
-    // merge them: listEntry has players/maxPlayers, detail has connection/paths/extras
-    const merged = listEntry ? { ...detail, ...listEntry } : detail;
+      // merge them: listEntry has players/maxPlayers, detail has connection/paths/extras
+      const merged = listEntry ? { ...detail, ...listEntry } : detail;
 
-    setData(merged);
-    setError('');
-  } catch (e) {
-    setError(e.message || 'Failed to load server');
-  } finally {
-    setLoading(false);
+      setData(merged);
+      setError('');
+    } catch (e) {
+      setError(e.message || 'Failed to load server');
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
 
   useEffect(() => { load() }, [id])
@@ -99,11 +99,14 @@ export default function ServerDetail() {
 
   // uptime
   useEffect(() => {
-    if (!data?.started_at) return;
+    const isOnline = data?.status?.toLowerCase() === "online";
+    if (!data?.started_at || !isOnline) return;
 
     const interval = setInterval(() => {
       setData(prev => {
         if (!prev?.started_at) return prev;
+        if (prev?.status?.toLowerCase() !== "online") return prev;
+
         const diffSec = Math.floor(
           (Date.now() - new Date(prev.started_at).getTime()) / 1000
         );
@@ -112,7 +115,8 @@ export default function ServerDetail() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [data?.started_at]);
+  }, [data?.started_at, data?.status]);
+
 
 
 
